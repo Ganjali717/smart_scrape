@@ -132,10 +132,16 @@ class FitLayoutClient:
                 },
             }
 
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "*/*",
+                "Authorization": SERVICE_AUTH_TOKEN,
+            }
+
             print(payload)
 
             # если у тебя create работает через GET с query-параметрами — можно заменить на params=payload
-            response = self.session.post(url, json=payload)
+            response = self.session.post(url, json=payload, headers=headers)
             response.raise_for_status()
 
             data = response.json()
