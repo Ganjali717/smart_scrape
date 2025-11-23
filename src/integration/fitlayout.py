@@ -117,16 +117,22 @@ class FitLayoutClient:
         try:
             url = f"{self.base_url}/r/{self.repo_id}/artifact/create"
 
-            # строка параметров в том же формате, что ты видишь в fl:creatorParams
-            params_str = (
-                f"url={page_url} "
-                "width=1200 height=800 persist=1 acquireImages=false includeScreenshot=true"
-            )
-
             payload = {
-                "service": service_id,  # например SERVICE_RENDER_ID
-                "params": params_str,
+                "serviceId": service_id,
+                "params": {
+                    "acquireImages": False,
+                    "width": 1200,
+                    "persist": 1,
+                    "includeScreenshot": True,
+                    "height": 800,
+                    "url": page_url,
+                    "startPage": 0,
+                    "zoom": 1,
+                    "endPage": 10,
+                },
             }
+
+            print(payload)
 
             # если у тебя create работает через GET с query-параметрами — можно заменить на params=payload
             response = self.session.post(url, json=payload)

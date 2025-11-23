@@ -61,7 +61,7 @@ def visualize_result(url, result, output_file="result_viz.png"):
 
 
 if __name__ == "__main__":
-    url = "https://books.toscrape.com/catalogue/the-constant-princess-the-tudor-court-1_493/index.html"
+    url = "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html"
 
     # Запускаем пайплайн снова
     pipeline = SmartScrapePipeline()

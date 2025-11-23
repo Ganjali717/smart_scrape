@@ -6,7 +6,7 @@ def main():
     pipeline = SmartScrapePipeline()
 
     # URL страницы товара (Books to Scrape)
-    url = "https://books.toscrape.com/catalogue/the-constant-princess-the-tudor-court-1_493/index.html"
+    url = "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html"
 
     result = pipeline.run(url)
 
