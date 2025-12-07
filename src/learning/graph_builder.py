@@ -19,15 +19,28 @@ class FitLayoutParser:
         """
         graphs = json_data.get("@graph", [])
 
+        # Плоский список всех элементов (верхний уровень + вложенные @graph)
+        flat_items = []
+        for g in graphs:
+            if isinstance(g, dict) and "@graph" in g:
+                flat_items.append(g)
+                inner = g.get("@graph", [])
+                if isinstance(inner, list):
+                    for inner_item in inner:
+                        if isinstance(inner_item, dict):
+                            flat_items.append(inner_item)
+            else:
+                flat_items.append(g)
+
         # Индекс всех объектов по @id: нужен, чтобы раскрывать b:bounds -> rect-объект
         id_index = {
             item["@id"]: item
-            for item in graphs
+            for item in flat_items
             if isinstance(item, dict) and "@id" in item
         }
 
         # Размеры страницы (b:width/b:height у объекта Page)
-        page_w, page_h = self._get_page_size(graphs)
+        page_w, page_h = self._get_page_size(flat_items)
 
         nodes = []
         raw_nodes = []
@@ -91,7 +104,8 @@ class FitLayoutParser:
             return None, None
 
         x_tensor = torch.stack(nodes)
-        edge_index = self._build_knn_edges(raw_nodes, k=3)
+        # edge_index = self._build_knn_edges(raw_nodes, k=3)
+        edge_index = self._build_hybrid_edges(raw_nodes, k=3)
         data = Data(x=x_tensor, edge_index=edge_index)
 
         return data, raw_nodes
@@ -102,6 +116,9 @@ class FitLayoutParser:
         """Поиск значения по суффиксу ключа (b:text, b:htmlTagName, b:bounds и т.д.)."""
         for k, v in d.items():
             if k.endswith(suffix):
+                # Значения FitLayout часто приходят в обёртке {"@value": "..."} — разворачиваем её
+                if isinstance(v, dict) and "@value" in v:
+                    return v["@value"]
                 return v
         return None
 
@@ -209,7 +226,63 @@ class FitLayoutParser:
 
             dists.sort(key=lambda x: x[0])
             for _, neighbor_idx in dists[:k]:
+                # Делаем граф неориентированным: добавляем рёбра в обе стороны
                 edges.append([i, neighbor_idx])
+                edges.append([neighbor_idx, i])
+
+        edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+        return edge_index
+
+    def _build_hybrid_edges(self, nodes_info, k=3):
+        """
+        Строит граф, объединяя:
+        1. KNN (визуальная близость)
+        2. Containment (вложенность/иерархия) - ключевое для статьи
+        """
+        edges = []
+        num_nodes = len(nodes_info)
+        if num_nodes < 2:
+            return torch.tensor([[0], [0]], dtype=torch.long)
+
+        for i in range(num_nodes):
+            xi, yi, wi, hi = nodes_info[i]["bbox"]
+
+            # --- 1. KNN Edges (Локальный контекст) ---
+            dists = []
+            for j in range(num_nodes):
+                if i == j:
+                    continue
+                xj, yj, _, _ = nodes_info[j]["bbox"]
+                # Евклидово расстояние
+                dist = ((xi - xj) ** 2 + (yi - yj) ** 2) ** 0.5
+                dists.append((dist, j))
+
+            dists.sort(key=lambda x: x[0])
+            for _, neighbor_idx in dists[:k]:
+                edges.append([i, neighbor_idx])
+
+            # --- 2. Containment Edges (Иерархический контекст) ---
+            # Это реализует логику "Visual grouping" из FitLayout [cite: 96]
+            for j in range(num_nodes):
+                if i == j:
+                    continue
+                xj, yj, wj, hj = nodes_info[j]["bbox"]
+
+                # Проверяем, находится ли узел J внутри узла I (Parent -> Child)
+                # Добавляем небольшой допуск (epsilon) для нечетких границ
+                if (
+                    (xi <= xj)
+                    and (yi <= yj)
+                    and (xi + wi >= xj + wj)
+                    and (yi + hi >= yj + hj)
+                ):
+                    edges.append([i, j])  # Parent -> Child
+                    edges.append(
+                        [j, i]
+                    )  # Child -> Parent (для прохода сообщения обратно)
+
+        # Удаляем дубликаты ребер
+        edges = list(set(tuple(e) for e in edges))
 
         edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
         return edge_index

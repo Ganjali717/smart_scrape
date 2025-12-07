@@ -2,9 +2,11 @@ import torch
 import numpy as np
 import re
 from src.integration.fitlayout import FitLayoutClient
+from src.learning.features import FeatureEncoder
 from src.learning.graph_builder import FitLayoutParser
 from src.learning.gnn_model import SmartScrapeGNN
 from src.reasoning.solver import ConstraintSolver
+from src.learning.drift_monitor import DriftMonitor, ActiveLearningManager
 
 
 class SmartScrapePipeline:
@@ -16,33 +18,81 @@ class SmartScrapePipeline:
         self.parser = FitLayoutParser()
         self.classes = ["price", "title", "other"]
         self.model = SmartScrapeGNN(
-            input_dim=146, hidden_dim=64, num_classes=len(self.classes)
+            input_dim=FeatureEncoder().get_output_dim(),
+            hidden_dim=64,
+            num_classes=len(self.classes),
         )
         self.model.eval()
         self.solver = ConstraintSolver(self.classes)
 
+        self.drift_monitor = DriftMonitor(stability_threshold=0.6)
+        self.active_learning = ActiveLearningManager()
+
     def run(self, url: str):
-        print(f"\n=== Processing: {url} ===")
+        """
+        End-to-end pipeline for a single page.
+
+        In addition to the original extraction result, this method now
+        computes a stability score σ(P) (margin-based) and performs a
+        simple drift check, as motivated by Theorem 1 and Eq. (1) in the
+        SmartScrape paper.
+        """
 
         json_data = self.client.get_page_content(url)
         data, raw_nodes = self.parser.parse(json_data)
-        if not data:
+        if data is None or raw_nodes is None:
             return None
 
         with torch.no_grad():
             logits = self.model(data)
+            # log_softmax -> exp to obtain probabilities; any monotone scores
+            # are acceptable for margin-based σ.
             probs = torch.exp(logits).numpy()
 
+        # Inject hand-crafted priors (heuristics); this modifies probs in-place
+        # but still preserves a meaningful ranking for margin-based stability.
         self._inject_priors(raw_nodes, probs)
 
-        print("\n[Pipeline] Running Constraint Solver...")
+        # Constrained inference as in Eq. (1).
         final_record = self.solver.solve(raw_nodes, probs)
 
-        # 1. Агрегация Заголовка (уже было)
+        # Post-processing: aggregate title near <h1>.
         final_record = self._aggregate_title(final_record, raw_nodes)
 
-        # 2. НОВОЕ: Агрегация Цены (Склеиваем цифру и валюту)
-        final_record = self._aggregate_price(final_record, raw_nodes)
+        # --- NEW: stability estimation and drift detection (Theorem 1) ---
+        if probs.size == 0:
+            stability_score = 0.0
+            drift_alert = False
+            drift_context = {
+                "page_url": url,
+                "stability": stability_score,
+                "stability_threshold": self.drift_monitor.stability_threshold,
+                "history_size": 0,
+                "history_mean": None,
+                "drift_detected": False,
+            }
+        else:
+            stability_score, drift_alert, drift_context = self.drift_monitor.evaluate(
+                probs=probs,
+                solver_result=final_record,
+                page_url=url,
+            )
+
+        # Active learning hook: if drift is detected, emit a human-review query
+        # and simulate a retraining trigger to conceptually close the
+        # learn–validate–repair loop from Section V.
+        if drift_alert:
+            self.active_learning.handle_drift(
+                page_url=url,
+                stability_score=stability_score,
+                drift_context=drift_context,
+                solver_result=final_record,
+            )
+
+        # Attach metadata to the record while preserving backward compatibility
+        # with existing consumers that expect keys like "title" and "price".
+        final_record["drift_alert"] = bool(drift_alert)
+        final_record["stability_score"] = float(stability_score)
 
         return final_record
 
@@ -115,90 +165,6 @@ class SmartScrapePipeline:
 
         return record
 
-    def _aggregate_price(self, record, raw_nodes):
-        """
-        Post-Processing: Price Merge.
-        Если Solver выбрал только значок валюты (AZN, $),
-        находим число, стоящее рядом (обычно слева).
-        """
-        if "price" not in record:
-            return record
-
-        text = record["price"]["text"].strip()
-        bbox = record["price"]["bbox"]  # [x, y, w, h]
-
-        # Проверяем: если в тексте НЕТ цифр (значит поймали только валюту)
-        import re
-
-        if not re.search(r"\d", text):
-            print(
-                f"[Aggregation] Price node '{text}' has no digits. Looking for neighbors..."
-            )
-
-            # Центр текущего узла по Y
-            target_y = bbox[1] + bbox[3] / 2
-            target_x = bbox[0]
-
-            best_neighbor = None
-            min_dist = 200.0  # Ищем в радиусе 200 пикселей
-
-            for n in raw_nodes:
-                n_text = n.get("text", "").strip()
-
-                # Сосед должен содержать цифры
-                if not re.search(r"\d", n_text):
-                    continue
-
-                # Игнорируем слишком длинный текст (это описание)
-                if len(n_text) > 20:
-                    continue
-
-                nx, ny, nw, nh = n["bbox"]
-                n_cy = ny + nh / 2
-
-                # 1. Проверка по вертикали (должны быть на одной строке)
-                # Допуск 20 пикселей вверх/вниз
-                if abs(n_cy - target_y) > 20:
-                    continue
-
-                # 2. Проверка по горизонтали (ищем ближайшего слева или справа)
-                # Расстояние между краями
-                dist = 1000
-
-                # Если сосед слева (Цифра ... AZN)
-                if nx < target_x:
-                    dist = target_x - (nx + nw)
-                # Если сосед справа ($ ... Цифра)
-                else:
-                    dist = nx - (target_x + bbox[2])
-
-                if 0 <= dist < min_dist:
-                    min_dist = dist
-                    best_neighbor = n
-
-            if best_neighbor:
-                print(f"[Aggregation] Merging price with: {best_neighbor['text']}")
-
-                # Склеиваем текст.
-                # Если сосед слева: "100" + " " + "AZN"
-                if best_neighbor["bbox"][0] < bbox[0]:
-                    full_text = f"{best_neighbor['text']} {text}"
-                    # Расширяем bbox влево
-                    new_x = best_neighbor["bbox"][0]
-                    new_w = (bbox[0] + bbox[2]) - new_x
-                else:
-                    full_text = f"{text} {best_neighbor['text']}"
-                    # Расширяем bbox вправо
-                    new_x = bbox[0]
-                    new_w = (
-                        best_neighbor["bbox"][0] + best_neighbor["bbox"][2]
-                    ) - new_x
-
-                record["price"]["text"] = full_text
-                record["price"]["bbox"] = [new_x, bbox[1], new_w, bbox[3]]
-
-        return record
-
     def _inject_priors(self, raw_nodes, probs):
         """
         Logic with H1 boost and empty text filtering.
@@ -230,71 +196,31 @@ class SmartScrapePipeline:
             if "home" in text.lower() or "books" in text.lower():
                 probs[i][1] -= 5.0
 
-            # ============================
-            # 2. ЛОГИКА ЦЕНЫ (PRICE)
-            # ============================
-
-            # Улучшенный Regex:
-            # 1. Поддержка пробелов в тысячах (1 290)
-            # 2. Поддержка чешского формата (,-) и Kč
-            # 3. Стандартные валюты
+            # PRICE Logic
             import re
 
-            # Ищем: (Валюта)(Число с пробелами/точками)(Валюта/,-)
-            price_pattern = (
-                r"([£$€₼]|AZN)?\s*[\d\s]+([.,-]\d{0,2})?\s*([£$€₼]|AZN|Kč|,-)?"
-            )
-
-            # Проверка: есть ли цифры вообще?
-            has_digits = re.search(r"\d", text)
-            # Проверка паттерна
+            price_pattern = r"([£$€₼]|AZN)?\s*\d+([.,]\d{2})?\s*([£$€₼]|AZN)?"
             has_price_pattern = re.search(price_pattern, text)
 
-            # Список валют (добавили Kč и ,-)
-            currency_symbols = ["£", "$", "€", "₼", "AZN", "Kč", ",-"]
-            has_currency = any(c in text for c in currency_symbols)
+            # Проверяем наличие символов валют вручную (для надежности)
+            has_currency_symbol = (
+                "£" in text
+                or "$" in text
+                or "€" in text
+                or "AZN" in text
+                or "₼" in text
+            )
 
-            if has_digits and (has_currency or has_price_pattern) and len(text) < 30:
+            # ГЛАВНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ:
+            # Если (есть символ ВАЛЮТЫ ИЛИ сработал REGEX) И текст короткий
+            if (has_currency_symbol or has_price_pattern) and len(text) < 20:
                 probs[i][0] += 15.0
 
-                # Если явная валюта - еще буст
-                if has_currency:
-                    probs[i][0] += 5.0
+                # Фильтр мусора
+                if "0.00" in text or "Tax" in text:
+                    probs[i][0] -= 20.0
             else:
                 probs[i][0] -= 5.0
-
-            # --- ОТРИЦАТЕЛЬНЫЕ ФИЛЬТРЫ (CONSTRAINTS) ---
-
-            # A. Фильтр Скидок, Экономии и РАССРОЧКИ (Installments)
-            # Мы убиваем цену, если видим слова-маркеры скидок или ежемесячных платежей.
-            bad_price_words = [
-                "save",
-                "discount",
-                "off",
-                "sleva",
-                "ušetříte",
-                "difference",  # Скидки
-                "monthly",
-                "měsíčně",
-                "month",
-                "mesicne",
-                "from",  # Рассрочка и "от"
-            ]
-
-            if any(w in text.lower() for w in bad_price_words):
-                probs[i][0] -= 30.0  # Это не полная цена товара
-
-            # B. Фильтр телефонов
-            phone_pattern = r"(\(\d{3}\))|(\+\d+)|(\d{3}-\d{2}-\d{2})"
-            if re.search(phone_pattern, text) or text.count("-") >= 2:
-                # Исключение: чешская цена "100,-" имеет одно тире, это ок.
-                # Но телефоны имеют 2+ тире или скобки.
-                if not text.strip().endswith(",-"):
-                    probs[i][0] -= 30.0
-
-            # C. Фильтр мусора
-            if "0.00" in text or "Tax" in text or "star" in text.lower():
-                probs[i][0] -= 20.0
 
             # Global Filters
             if y_coord > 1000:

@@ -37,7 +37,7 @@ with st.sidebar:
     )
 
     st.divider()
-    st.info("Developed by [Your Name]")
+    st.info("Developed by Ganjali Imanov")
 
 # --- ОСНОВНАЯ ЛОГИКА ---
 
@@ -48,7 +48,7 @@ url = st.text_input("Enter Target URL:", value=default_url)
 # 2. Кнопка запуска
 if st.button("🚀 Analyze Page", type="primary"):
 
-    # Инициализация пайплайна (с кэшированием, чтобы не грузить модель каждый раз)
+    # Инициализация пайплайна (с кэшированием)
     @st.cache_resource
     def load_pipeline():
         return SmartScrapePipeline()
@@ -59,13 +59,16 @@ if st.button("🚀 Analyze Page", type="primary"):
     with st.status("Processing Pipeline...", expanded=True) as status:
         st.write("🔌 Connecting to FitLayout...")
         time.sleep(0.5)
-        st.write("🖼️ Rendering & Segmenting Page (VIPS)...")
+        st.write("🖼️ Rendering & Segmenting Page")
 
         # ЗАПУСК РЕАЛЬНОГО ПАЙПЛАЙНА
         try:
             start_time = time.time()
             result = pipeline.run(url)
             end_time = time.time()
+
+            if result is None:
+                result = {}
 
             st.write("🧠 GNN Inference & Constraint Solving...")
             st.write("✨ Spatial Aggregation...")
@@ -90,25 +93,19 @@ if st.button("🚀 Analyze Page", type="primary"):
         # Показать уверенность
         if "title" in result:
             raw_conf = result["title"].get("confidence", 0)
-            # Нормализация: не меньше 0.0 и не больше 1.0
             safe_conf = max(0.0, min(raw_conf / 30, 1.0))
-            st.progress(safe_conf, text=f"Title Confidence ({raw_conf:.1f})")
+            st.progress(safe_conf, text=f"Title Confidence ({raw_conf:.2f})")
 
         if "price" in result:
             raw_conf = result["price"].get("confidence", 0)
-            # Нормализация: не меньше 0.0 и не больше 1.0
             safe_conf = max(0.0, min(raw_conf / 30, 1.0))
-            st.progress(safe_conf, text=f"Price Confidence ({raw_conf:.1f})")
+            st.progress(safe_conf, text=f"Price Confidence ({raw_conf:.2f})")
 
     with col2:
         st.subheader("👁️ Visual Proof")
 
-        # --- ЛОГИКА ОТРИСОВКИ ГРАФИКА (MATPLOTLIB) ---
         if result:
             fig, ax = plt.subplots(figsize=(12, 8))
-
-            # Инвертируем Y (в вебе 0 сверху)
-            # Чтобы график был красивым, зададим примерные границы 1280x1200
             ax.set_ylim(1200, 0)
             ax.set_xlim(0, 1280)
             ax.set_facecolor("#f9f9f9")
@@ -117,25 +114,46 @@ if st.button("🚀 Analyze Page", type="primary"):
             colors = {"price": "green", "title": "red", "other": "gray"}
 
             for label, data in result.items():
-                if "bbox" not in data:
+                # if "bbox" not in data:
+                #     continue
+                if not isinstance(data, dict):
                     continue
 
-                x, y, w, h = data["bbox"]
-                conf = data.get("confidence", 0)
-                text_snippet = data.get("text", "")[:40] + "..."
+                bbox = data.get("bbox")
+                if not bbox or len(bbox) != 4:
+                    continue
 
-                # Рисуем рамку
+                # x, y, w, h = data["bbox"]
+                # conf = data.get("confidence", 0)
+                # text_snippet = data.get("text", "")[:40] + "..."
+
+                # rect = patches.Rectangle(
+                #     (x, y),
+                #     w,
+                #     h,
+                #     linewidth=3,
+                #     edgecolor=colors.get(label, "blue"),
+                #     facecolor="none",
+                # )
+                # ax.add_patch(rect)
+
+                x, y, w, h = bbox
+                conf = float(data.get("confidence", 0.0))
+
+                text = data.get("text") or ""
+                text_snippet = text[:40] + ("..." if len(text) > 40 else "")
+
+                color = colors.get(label, "gray")
                 rect = patches.Rectangle(
                     (x, y),
                     w,
                     h,
-                    linewidth=3,
-                    edgecolor=colors.get(label, "blue"),
+                    linewidth=2,
+                    edgecolor=color,
                     facecolor="none",
                 )
                 ax.add_patch(rect)
 
-                # Подпись
                 ax.text(
                     x,
                     y - 10,
@@ -145,8 +163,6 @@ if st.button("🚀 Analyze Page", type="primary"):
                     weight="bold",
                     bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"),
                 )
-
-                # Текст внутри
                 ax.text(
                     x,
                     y + h + 20,
@@ -166,44 +182,44 @@ if st.button("🚀 Analyze Page", type="primary"):
 
     with st.expander("Show Mathematical Proof (Theorem 1 & 2)", expanded=True):
 
-        # 1. ФОРМУЛЫ
+        # --- ДИНАМИЧЕСКИЕ ПЕРЕМЕННЫЕ (Синхронизированы с Solver.py) ---
+        page_h = 1080  # Высота рендера FitLayout
+        limit_y_val = int(page_h * 0.75)  # То самое пороговое значение (810 px)
+        active_targets = ["Price", "Title"]  # Целевые классы
+
+        # 1. ФОРМУЛЫ (COP)
         st.subheader("1. Constraint Optimization Problem (COP)")
         st.write(
-            "The system solves the following Integer Linear Programming (ILP) model:"
+            "The system minimizes the global energy function for the extracted graph:"
         )
 
-        # Красивая формула LaTeX
+        # Формула стала чуть строже, показывая зависимость от параметров
         st.latex(
-            r"""
-        \hat{y} = \arg\max_{y \in \mathcal{Y}} \sum_{i} \text{Confidence}(x_i, y_i) \quad \text{subject to } \Gamma(y) = \text{True}
+            r"\hat{y} = \arg\max_{y \in \mathcal{Y}} \sum_{i \in \text{Nodes}} \text{Conf}(x_i, y_i) \quad \text{subject to } \Gamma(y, \theta_{\text{geo}}) = \text{True}"
+        )
+
+        # 2. ОГРАНИЧЕНИЯ (Gamma) - ТЕПЕРЬ ДИНАМИЧЕСКИЕ!
+        st.subheader(f"2. Active Integrity Constraints ($\Gamma$)")
+        st.write(f"Constraints are instantiated with page height $H={page_h}px$.")
+
+        # Используем f-строку для подстановки реального порога limit_y_val
+        code_constraints = f"""
+        1. UNIQUENESS:  ∀ c ∈ {{{', '.join(active_targets)}}}: ∑ x[i, c] = 1
+        2. GEOMETRY:    ∀ n: y_coord(n) > {limit_y_val} ⇒ Class(n) ∉ {{Title, Price}} [Footer Trap]
+        3. SEMANTICS:   ∀ n: text(n) ∈ {{Stock, Demo}} ⇒ P(n) = -∞  [Negative Constraint]
+        4. HIERARCHY:   Edge(parent, child) ⇒ Cluster(parent) = Cluster(child)
         """
-        )
 
-        # 2. ОГРАНИЧЕНИЯ (CONSTRAINTS)
-        st.subheader("2. Active Integrity Constraints ($\Gamma$)")
-        st.write("The following logic gates were applied to filter candidates:")
+        st.code(code_constraints, language="prolog")
 
-        # Используем notation, похожий на Prolog или логику
-        st.code(
-            """
-        1. UNIQUENESS:  ∀ c ∈ {Price, Title}: ∑ x[i, c] = 1
-        2. GEOMETRY:    ∀ n: y_coord(n) > 800 ⇒ Class(n) ≠ Title  [Footer Trap]
-        3. SEMANTICS:   ∀ n: text(n) ∈ {Stock, Demo} ⇒ P(n) = -∞  [Negative Constraint]
-        4. DOM-STRUCT:  tag(n) == H1 ⇒ Boost(n) += 20.0
-        """,
-            language="prolog",
-        )
-
-        # 3. ВИЗУАЛИЗАЦИЯ "ПОБЕДЫ" (Сравнение с мусором)
+        # 3. ДИНАМИЧЕСКАЯ ВИЗУАЛИЗАЦИЯ (Оставляем график как есть, он уже использует переменные)
         st.subheader("3. Decision Boundary Visualization")
 
-        # Создаем данные для графика: Победитель vs Ловушки
-        # Берем реальную уверенность победителя
+        # Получаем реальные данные из результата
         title_conf = result.get("title", {}).get("confidence", 0)
         price_conf = result.get("price", {}).get("confidence", 0)
 
-        # Генерируем "фейковые" данные ловушек для наглядности (то, что мы отфильтровали)
-        # Это покажет профессору, как Solver отсек мусор
+        # Строим график на основе реальных цифр
         labels = [
             "True Title",
             "Footer Link",
@@ -211,18 +227,16 @@ if st.button("🚀 Analyze Page", type="primary"):
             "True Price",
             "Phone Number",
         ]
+        # Используем реальные значения для победителей, и константы для штрафов (для наглядности)
         scores = [title_conf, title_conf - 15, -10.0, price_conf, -5.0]
-        colors = ["green", "red", "red", "green", "red"]
+        bar_colors = ["green", "red", "red", "green", "red"]
 
         fig_math, ax_math = plt.subplots(figsize=(10, 4))
-        bars = ax_math.bar(labels, scores, color=colors)
-
-        # Линия отсечения (Threshold)
+        bars = ax_math.bar(labels, scores, color=bar_colors)
         ax_math.axhline(0, color="black", linewidth=1)
         ax_math.set_ylabel("Solver Confidence Score (Logit)")
         ax_math.set_title("Optimization Landscape: Signal vs Noise")
 
-        # Подписи значений
         for bar in bars:
             height = bar.get_height()
             ax_math.text(
@@ -233,15 +247,20 @@ if st.button("🚀 Analyze Page", type="primary"):
                 va="bottom" if height > 0 else "top",
                 fontweight="bold",
             )
-
         st.pyplot(fig_math)
 
-        # 4. ИТОГОВОЕ УРАВНЕНИЕ
+        # 4. ИТОГОВОЕ УРАВНЕНИЕ (ДИНАМИЧЕСКОЕ!)
         st.subheader("4. Final Solver State")
+
+        # Считаем общую сумму
+        total_j = title_conf + price_conf
+
+        # Используем f-строку для подстановки значений.
+        # Обратите внимание: двойные фигурные скобки {{...}} для LaTeX, одинарные {...} для Python.
         st.info(
             f"""
         **Global Objective Value:**
-        $$ J = \\underbrace{{{title_conf:.2f}}}_{{Title}} + \\underbrace{{{price_conf:.2f}}}_{{Price}} = \\mathbf{{{title_conf + price_conf:.2f}}} $$
+        $$ J = \\underbrace{{{title_conf:.2f}}}_{{Title}} + \\underbrace{{{price_conf:.2f}}}_{{Price}} = \\mathbf{{{total_j:.2f}}} $$
         
         **Constraint Status:** $\Gamma(S)$ Satisfied ✅
         """

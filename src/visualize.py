@@ -12,6 +12,10 @@ def visualize_result(url, result, output_file="result_viz.png"):
     # Создаем белое полотно размером с экран (примерно)
     # В идеале нужно скачать скриншот из FitLayout, но пока нарисуем схему
 
+    if result is None:
+        return
+
+    # Создаем белое полотно размером с экран (примерно)
     fig, ax = plt.subplots(figsize=(12, 10))
 
     # Рисуем "страницу" (координаты из FitLayout обычно большие)
