@@ -1,0 +1,30 @@
+[
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.027090406283400113,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.027090406283400113,
+      "stability_threshold": 0.6,
+      "history_size": 12,
+      "history_mean": 73.72846883863933,
+      "drift_detected": true,
+      "solver_keys": [
+        "title",
+        "price"
+      ]
+    },
+    "timestamp_utc": "2025-12-07T08:36:23.333965Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Tipping the Velvet",
+        "confidence": 7.3315300941467285
+      },
+      "price": {
+        "text": "\u00a353.74",
+        "confidence": 15.355403900146484
+      }
+    }
+  }
+]
