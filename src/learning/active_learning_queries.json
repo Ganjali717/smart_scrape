@@ -26,5 +26,179 @@
         "confidence": 15.355403900146484
       }
     }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.0007572174072265625,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.0007572174072265625,
+      "stability_threshold": 0.6,
+      "history_size": 38,
+      "history_mean": 21.982473865398042,
+      "drift_detected": true,
+      "timestamp": "2025-12-09T23:23:26.905468Z"
+    },
+    "timestamp_utc": "2025-12-09T23:23:26.905485Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "score": 5.355403900146484,
+        "proof": {
+          "node_ids": [
+            "r:art83#b40"
+          ],
+          "constraints": [
+            "unique[price]",
+            "format[price]",
+            "visual[price]"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Tipping the Velvet",
+        "bbox": [
+          312.0,
+          169.0,
+          111.0,
+          16.0
+        ],
+        "score": 7.3315300941467285,
+        "proof": {
+          "node_ids": [
+            "r:art83#b23"
+          ],
+          "constraints": [
+            "unique[title]",
+            "format[title]"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.0008592605590820312,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.0008592605590820312,
+      "stability_threshold": 0.2,
+      "history_size": 39,
+      "history_mean": 21.418842721684225,
+      "drift_detected": true,
+      "timestamp": "2025-12-09T23:27:38.347440Z"
+    },
+    "timestamp_utc": "2025-12-09T23:27:38.347461Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "score": 20.355403900146484,
+        "proof": {
+          "node_ids": [
+            "r:art83#b40"
+          ],
+          "constraints": [
+            "unique[price]",
+            "format[price]",
+            "visual[price]"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Tipping the Velvet",
+        "bbox": [
+          312.0,
+          169.0,
+          111.0,
+          16.0
+        ],
+        "score": 5.3315300941467285,
+        "proof": {
+          "node_ids": [
+            "r:art83#b23"
+          ],
+          "constraints": [
+            "unique[title]",
+            "format[title]"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.0008592605590820312,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.0008592605590820312,
+      "stability_threshold": 0.2,
+      "history_size": 40,
+      "history_mean": 20.88339313515609,
+      "drift_detected": true,
+      "timestamp": "2025-12-09T23:30:08.857049Z"
+    },
+    "timestamp_utc": "2025-12-09T23:30:08.857065Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 20.355403900146484,
+        "proof": {
+          "node_ids": [
+            "r:art83#b40"
+          ],
+          "constraints": [
+            "unique[price]",
+            "format[price]",
+            "visual[price]"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Tipping the Velvet",
+        "bbox": [
+          312.0,
+          169.0,
+          111.0,
+          16.0
+        ],
+        "confidence": 5.3315300941467285,
+        "proof": {
+          "node_ids": [
+            "r:art83#b23"
+          ],
+          "constraints": [
+            "unique[title]",
+            "format[title]"
+          ],
+          "violated": []
+        }
+      }
+    }
   }
 ]

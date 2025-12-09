@@ -31,9 +31,7 @@ import numpy as np
 def _default_history_path() -> Path:
     """
     Default location for drift history.
-
-    For a prototype, we keep the file next to this module, which mimics an
-    on-disk approximation of the monitoring store used in Section VIII.
+    Mimics an on-disk approximation of the monitoring store (Section VIII).
     """
     return Path(__file__).resolve().parent / "drift_history.json"
 
@@ -46,27 +44,13 @@ def _default_query_log_path() -> Path:
 class DriftMonitor:
     """
     Monitors stability σ(P) for a page and performs simple drift detection.
-
-    Stability is computed via margin sampling, which is a standard
-    uncertainty metric and aligns with the stability score σ_f(P) mentioned
-    before Theorem 1: pages with low σ are likely to be affected by
-    template drift Δ, even if Eq. (1) is still optimised locally.
-
-    Attributes
-    ----------
-    stability_threshold : float
-        If E[margin] < stability_threshold, the page is flagged as drifted.
-    history_path : Path
-        Where to store historical stability scores (JSON).
-    max_history : int
-        Maximum number of past scores to retain.
     """
 
     stability_threshold: float = 0.6
     history_path: Path = field(default_factory=_default_history_path)
     max_history: int = 1000
 
-    # internal state (list[float]) maintained across calls
+    # internal state maintained across calls
     _history: List[float] = field(init=False, default_factory=list)
 
     def __post_init__(self) -> None:
@@ -79,33 +63,14 @@ class DriftMonitor:
     def compute_node_margins(probs: np.ndarray) -> np.ndarray:
         """
         Compute per-node margin scores: p_top1 - p_top2.
-
-        Parameters
-        ----------
-        probs : np.ndarray
-            Array of shape [num_nodes, num_classes] with class probabilities
-            or unnormalised scores (monotone transforms are acceptable).
-
-        Returns
-        -------
-        np.ndarray
-            Array of shape [num_nodes] with margin scores in [0, 1]
-            (assuming probs are valid probabilities).
         """
         if probs.size == 0:
             return np.asarray([], dtype=float)
 
         if probs.ndim != 2 or probs.shape[1] < 2:
-            # Degenerate case: cannot compute a meaningful margin.
-            # We conservatively treat all nodes as maximally uncertain.
             return np.zeros(probs.shape[0], dtype=float)
 
-        # Use partitioning for efficiency: we only need the two largest values.
-        # For each row i, we compute the largest and second-largest scores.
-        # Note: we work on a copy to avoid mutating the input.
         scores = np.array(probs, dtype=float)
-        # argpartition to get indices of top2; then sort those two.
-        # For clarity (and since num_classes is small), we simply sort:
         sorted_scores = np.sort(scores, axis=1)
         top1 = sorted_scores[:, -1]
         top2 = sorted_scores[:, -2]
@@ -115,14 +80,64 @@ class DriftMonitor:
     def compute_page_stability(self, probs: np.ndarray) -> float:
         """
         Aggregate node-level margins into a page-level stability score.
-
-        This is the empirical counterpart of σ(P) in Theorem 1: if σ(P) is
-        high, the learned selector class is likely to be Δ-stable on P.
+        Empirical counterpart of σ(P) in Theorem 1.
         """
         margins = self.compute_node_margins(probs)
         if margins.size == 0:
             return 0.0
         return float(np.mean(margins))
+
+    # ---------------- public API ----------------
+
+    def evaluate_simple(
+        self, stability_score: float, page_url: str
+    ) -> Tuple[bool, Dict[str, Any]]:
+        """
+        Simplified entry point used by the InferenceEngine pipeline.
+
+        Accepts a pre-calculated stability_score (σ) from the solver engine
+        instead of raw probabilities. This allows the InferenceEngine to
+        handle the mathematical details of σ calculation directly.
+        """
+        # 1. Detect Drift based on Threshold (Theorem 1)
+        drift_detected = stability_score < self.stability_threshold
+
+        # 2. Update History
+        self._history.append(stability_score)
+        self._save_history()
+
+        # 3. Build Context for UI/Logs
+        historical_mean = float(np.mean(self._history)) if self._history else 0.0
+
+        context = {
+            "page_url": page_url,
+            "stability": stability_score,
+            "stability_threshold": self.stability_threshold,
+            "history_size": len(self._history),
+            "history_mean": historical_mean,
+            "drift_detected": drift_detected,
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+        }
+
+        return drift_detected, context
+
+    def evaluate(
+        self,
+        probs: np.ndarray,
+        solver_result: Optional[Dict[str, Any]] = None,
+        page_url: Optional[str] = None,
+    ) -> Tuple[float, bool, Dict[str, Any]]:
+        """
+        Compute stability σ from raw probs, detect drift, and update history.
+        Legacy method for direct GNN usage.
+        """
+        stability = self.compute_page_stability(probs)
+        drift_detected, context = self.evaluate_simple(stability, page_url or "unknown")
+
+        if solver_result is not None:
+            context["solver_keys"] = list(solver_result.keys())
+
+        return stability, drift_detected, context
 
     # ---------------- history management ----------------
 
@@ -130,7 +145,6 @@ class DriftMonitor:
         if not self.history_path.exists():
             self._history = []
             return
-
         try:
             raw = json.loads(self.history_path.read_text(encoding="utf-8"))
             if isinstance(raw, dict) and "scores" in raw:
@@ -139,10 +153,8 @@ class DriftMonitor:
                 scores = raw
             else:
                 scores = []
-
             self._history = [float(s) for s in scores if isinstance(s, (int, float))]
         except Exception:
-            # Corrupted or incompatible file — reset history.
             self._history = []
 
     def _save_history(self) -> None:
@@ -153,86 +165,17 @@ class DriftMonitor:
                 json.dumps(payload, indent=2), encoding="utf-8"
             )
         except Exception:
-            # For a prototype we silently ignore persistence failures.
             pass
-
-    # ---------------- public API ----------------
-
-    def evaluate(
-        self,
-        probs: np.ndarray,
-        solver_result: Optional[Dict[str, Any]] = None,
-        page_url: Optional[str] = None,
-    ) -> Tuple[float, bool, Dict[str, Any]]:
-        """
-        Compute stability σ, detect drift, and update history.
-
-        Parameters
-        ----------
-        probs : np.ndarray
-            Node-level probabilities/scores from the GNN + priors.
-        solver_result : dict, optional
-            Final structured prediction for the page (title/price/etc.).
-            Included only for context in diagnostic metadata.
-        page_url : str, optional
-            URL of the page, used for reporting and traceability.
-
-        Returns
-        -------
-        stability : float
-            Average margin-based stability score for the page.
-        drift_detected : bool
-            True if stability < stability_threshold.
-        context : dict
-            Diagnostic metadata (current σ, historical mean, counts, URL).
-        """
-        stability = self.compute_page_stability(probs)
-
-        historical_mean: Optional[float]
-        if self._history:
-            historical_mean = float(np.mean(self._history))
-        else:
-            historical_mean = None
-
-        drift_detected = stability < self.stability_threshold
-
-        # Update history (we treat every page as another sample from Δ).
-        self._history.append(stability)
-        self._save_history()
-
-        context: Dict[str, Any] = {
-            "page_url": page_url,
-            "stability": stability,
-            "stability_threshold": self.stability_threshold,
-            "history_size": len(self._history),
-            "history_mean": historical_mean,
-            "drift_detected": drift_detected,
-        }
-        # Optionally attach a shallow snapshot of solver_result for debugging.
-        if solver_result is not None:
-            context["solver_keys"] = list(solver_result.keys())
-
-        return stability, drift_detected, context
 
 
 @dataclass
 class ActiveLearningManager:
     """
     Simulated active learning controller.
-
-    In the full learn–validate–repair loop, pages with low σ would be sent
-    to human annotators; their labels would then update Eq. (1) via another
-    round of training. Here we only emit a query stub and log a mock
-    “retraining trigger”.
-
-    Attributes
-    ----------
-    query_log_path : Path
-        Where to store the list of query requests.
+    Emits human-labeling queries when drift is detected.
     """
 
     query_log_path: Path = field(default_factory=_default_query_log_path)
-
     _queries: List[Dict[str, Any]] = field(init=False, default_factory=list)
 
     def __post_init__(self) -> None:
@@ -260,8 +203,6 @@ class ActiveLearningManager:
         except Exception:
             pass
 
-    # ---------------- public API ----------------
-
     def create_query_request(
         self,
         page_url: str,
@@ -269,12 +210,6 @@ class ActiveLearningManager:
         drift_context: Dict[str, Any],
         solver_result: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """
-        Build a human-review request for a drifted page.
-
-        This structure is intentionally verbose; in a production setting
-        it would be sent to an annotation system / labeling UI.
-        """
         timestamp = datetime.utcnow().isoformat() + "Z"
         request: Dict[str, Any] = {
             "page_url": page_url,
@@ -283,18 +218,10 @@ class ActiveLearningManager:
             "drift_context": drift_context,
             "timestamp_utc": timestamp,
         }
-
-        # Attach a compact snapshot of the solver output, if available.
         if solver_result is not None:
             request["prediction_summary"] = {
-                k: {
-                    "text": v.get("text"),
-                    "confidence": v.get("confidence"),
-                }
-                for k, v in solver_result.items()
-                if isinstance(v, dict) and "text" in v
+                k: v for k, v in solver_result.items() if k != "_meta"
             }
-
         return request
 
     def handle_drift(
@@ -305,13 +232,7 @@ class ActiveLearningManager:
         solver_result: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Handle a drift event by:
-
-        1. Enqueuing a human-annotation query.
-        2. Emitting a mock “retraining trigger” message.
-
-        This is the glue that closes the learn–validate–repair loop in
-        Section V without actually retraining models.
+        Handle a drift event by enqueuing a human-annotation query.
         """
         query = self.create_query_request(
             page_url=page_url,
@@ -322,11 +243,8 @@ class ActiveLearningManager:
         self._queries.append(query)
         self._save_queries()
 
-        # Mock retraining trigger — in a full system this would enqueue
-        # a job for the training pipeline.
         print(
             f"[ActiveLearning] Retraining trigger (mock) for page={page_url!r}, "
             f"sigma={stability_score:.3f}"
         )
-
         return query
