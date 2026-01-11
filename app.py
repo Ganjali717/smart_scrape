@@ -60,7 +60,7 @@ if mode == "🔴 Live Extraction":
         "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html"
     )
     url = st.text_input("Target URL:", value=default_url)
-
+    print(f"Target URL: {url}")
     if st.button("🚀 Analyze Page", type="primary"):
         with st.status("Running SmartScrape Pipeline...", expanded=True) as status:
             st.write("🔌 Rendering Page (FitLayout)...")
