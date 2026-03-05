@@ -49,7 +49,7 @@ with st.sidebar:
     st.success(f"Backend:\n`{API_BASE_URL}`")
 
 selected_mode = cast(Literal["ilp", "greedy"], reasoning_mode)
-pipeline = load_pipeline(reasoning_mode=selected_mode, use_mock=allow_mock)
+pipeline = load_pipeline(reasoning_mode=selected_mode, use_mock=False)
 
 # ============================================================
 # TEST SET — all 51 labeled pages
@@ -251,83 +251,83 @@ Reasoning mode: {reasoning_mode.upper()}""", language="prolog")
 # ============================================================
 # MODE 2: BATCH EVALUATION
 # ============================================================
-    elif mode == "📊 Batch Evaluation":
-        st.title("📊 Empirical Evaluation")
-        st.markdown(
-            f"**Goal:** Validate robustness across {len(TEST_SET)} pages. "
-            f"**Reasoning:** `{reasoning_mode.upper()}`"
-        )
+elif mode == "📊 Batch Evaluation":
+    st.title("📊 Empirical Evaluation")
+    st.markdown(
+        f"**Goal:** Validate robustness across {len(TEST_SET)} pages. "
+        f"**Reasoning:** `{reasoning_mode.upper()}`"
+    )
 
-        if not pipeline._model_trained:
-            st.warning("⚠️ GNN model not trained. Run `train.py` first.")
+    if not pipeline._model_trained:
+        st.warning("⚠️ GNN model not trained. Run `train.py` first.")
 
-        # Subset selector
-        n_total = len(TEST_SET)
-        n_run = st.slider("Number of pages to evaluate:", 5, n_total, 20)
-        test_subset = TEST_SET[:n_run]
+    # Subset selector
+    n_total = len(TEST_SET)
+    n_run = st.slider("Number of pages to evaluate:", 5, n_total, 20)
+    test_subset = TEST_SET[:n_run]
 
-        if st.button("▶️ Run Benchmark Protocol", type="primary"):
-            results_data = []
-            progress_bar = st.progress(0)
-            correct_titles = correct_prices = correct_both = constraint_violations = 0
+    if st.button("▶️ Run Benchmark Protocol", type="primary"):
+        results_data = []
+        progress_bar = st.progress(0)
+        correct_titles = correct_prices = correct_both = constraint_violations = 0
 
-            for i, item in enumerate(test_subset):
-                res = pipeline.run(item["url"])
-                pred_title = res.get("title", {}).get("text", "") if res else ""
-                pred_price = res.get("price", {}).get("text", "") if res else ""
-                sigma      = res.get("_meta", {}).get("stability_score", 0.0) if res else 0.0
-                price_bbox = res.get("price", {}).get("bbox", [0,0,0,0]) if res else [0,0,0,0]
+        for i, item in enumerate(test_subset):
+            res = pipeline.run(item["url"])
+            pred_title = res.get("title", {}).get("text", "") if res else ""
+            pred_price = res.get("price", {}).get("text", "") if res else ""
+            sigma      = res.get("_meta", {}).get("stability_score", 0.0) if res else 0.0
+            price_bbox = res.get("price", {}).get("bbox", [0,0,0,0]) if res else [0,0,0,0]
 
-                if price_bbox[1] > 1080 * FOOTER_THRESHOLD:
-                    constraint_violations += 1
+            if price_bbox[1] > 1080 * FOOTER_THRESHOLD:
+                constraint_violations += 1
 
-                t_ok = item["exp_title"][:8].lower() in pred_title.lower()
-                p_ok = item["exp_price"] in pred_price.replace("£", "")
+            t_ok = item["exp_title"][:8].lower() in pred_title.lower()
+            p_ok = item["exp_price"] in pred_price.replace("£", "")
 
-                if t_ok: correct_titles += 1
-                if p_ok: correct_prices += 1
-                if t_ok and p_ok: correct_both += 1
+            if t_ok: correct_titles += 1
+            if p_ok: correct_prices += 1
+            if t_ok and p_ok: correct_both += 1
 
-                results_data.append({
-                    "Page": item["url"].split("/")[4][:25],
-                    "Exp. Title": item["exp_title"],
-                    "Got Title":  pred_title[:30] if pred_title else "—",
-                    "T✓": "✅" if t_ok else "❌",
-                    "Exp. Price": "£" + item["exp_price"],
-                    "Got Price":  pred_price if pred_price else "—",
-                    "P✓": "✅" if p_ok else "❌",
-                    "σ(P)": round(sigma, 3),
-                })
-                progress_bar.progress((i + 1) / len(test_subset))
+            results_data.append({
+                "Page": item["url"].split("/")[4][:25],
+                "Exp. Title": item["exp_title"],
+                "Got Title":  pred_title[:30] if pred_title else "—",
+                "T✓": "✅" if t_ok else "❌",
+                "Exp. Price": "£" + item["exp_price"],
+                "Got Price":  pred_price if pred_price else "—",
+                "P✓": "✅" if p_ok else "❌",
+                "σ(P)": round(sigma, 3),
+            })
+            progress_bar.progress((i + 1) / len(test_subset))
 
-            df = pd.DataFrame(results_data)
-            st.dataframe(df, use_container_width=True)
+        df = pd.DataFrame(results_data)
+        st.dataframe(df, use_container_width=True)
 
-            n = len(test_subset)
-            c1, c2, c3, c4, c5 = st.columns(5)
-            c1.metric("Title F1",      f"{correct_titles/n*100:.0f}%")
-            c2.metric("Price F1",      f"{correct_prices/n*100:.0f}%")
-            c3.metric("Both Correct",  f"{correct_both/n*100:.0f}%")
-            c4.metric("Constraint Violations", str(constraint_violations))
-            c5.metric("Pages Evaluated", str(n))
+        n = len(test_subset)
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("Title F1",      f"{correct_titles/n*100:.0f}%")
+        c2.metric("Price F1",      f"{correct_prices/n*100:.0f}%")
+        c3.metric("Both Correct",  f"{correct_both/n*100:.0f}%")
+        c4.metric("Constraint Violations", str(constraint_violations))
+        c5.metric("Pages Evaluated", str(n))
 
-            if correct_both == n:
-                st.success("🏆 Perfect Score!")
-            if constraint_violations == 0:
-                st.success("✅ No constraint violations.")
-            else:
-                st.warning(f"⚠️ {constraint_violations} violation(s) — switch to ILP to enforce Γ.")
+        if correct_both == n:
+            st.success("🏆 Perfect Score!")
+        if constraint_violations == 0:
+            st.success("✅ No constraint violations.")
+        else:
+            st.warning(f"⚠️ {constraint_violations} violation(s) — switch to ILP to enforce Γ.")
 
-            # σ(P) distribution chart
-            st.markdown("---")
-            st.subheader("σ(P) Distribution — Stability across pages")
-            fig_s, ax_s = plt.subplots(figsize=(12, 3))
-            sigmas = [r["σ(P)"] for r in results_data]
-            pages  = [r["Page"] for r in results_data]
-            colors_s = ["green" if s >= STABILITY_THRESHOLD else "red" for s in sigmas]
-            ax_s.bar(pages, sigmas, color=colors_s)
-            ax_s.axhline(STABILITY_THRESHOLD, color="red", linestyle="--", label=f"τ={STABILITY_THRESHOLD}")
-            ax_s.set_xticklabels(pages, rotation=45, ha="right", fontsize=7)
-            ax_s.set_ylabel("σ(P)")
-            ax_s.legend()
-            st.pyplot(fig_s)
+        # σ(P) distribution chart
+        st.markdown("---")
+        st.subheader("σ(P) Distribution — Stability across pages")
+        fig_s, ax_s = plt.subplots(figsize=(12, 3))
+        sigmas = [r["σ(P)"] for r in results_data]
+        pages  = [r["Page"] for r in results_data]
+        colors_s = ["green" if s >= STABILITY_THRESHOLD else "red" for s in sigmas]
+        ax_s.bar(pages, sigmas, color=colors_s)
+        ax_s.axhline(STABILITY_THRESHOLD, color="red", linestyle="--", label=f"τ={STABILITY_THRESHOLD}")
+        ax_s.set_xticklabels(pages, rotation=45, ha="right", fontsize=7)
+        ax_s.set_ylabel("σ(P)")
+        ax_s.legend()
+        st.pyplot(fig_s)

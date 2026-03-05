@@ -11266,5 +11266,3217 @@
         }
       }
     }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 263,
+      "history_mean": 4.221621641548513,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:24:08.750818Z"
+    },
+    "timestamp_utc": "2026-03-05T19:24:08.750818Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "greedy",
+          "constraints": [],
+          "violated": [
+            "no_constraint_enforcement"
+          ]
+        }
+      },
+      "title": {
+        "text": "Tipping the Velvet",
+        "bbox": [
+          200,
+          50,
+          600,
+          40
+        ],
+        "confidence": -29.666666666666668,
+        "proof": {
+          "reasoning": "greedy",
+          "constraints": [],
+          "violated": [
+            "no_constraint_enforcement"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 264,
+      "history_mean": 4.205630650482041,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:26:00.800851Z"
+    },
+    "timestamp_utc": "2026-03-05T19:26:00.801851Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "greedy",
+          "constraints": [],
+          "violated": [
+            "no_constraint_enforcement"
+          ]
+        }
+      },
+      "title": {
+        "text": "Tipping the Velvet",
+        "bbox": [
+          200,
+          50,
+          600,
+          40
+        ],
+        "confidence": -29.666666666666668,
+        "proof": {
+          "reasoning": "greedy",
+          "constraints": [],
+          "violated": [
+            "no_constraint_enforcement"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 265,
+      "history_mean": 4.1897603461405994,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:32:18.545935Z"
+    },
+    "timestamp_utc": "2026-03-05T19:32:18.545935Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "greedy",
+          "constraints": [],
+          "violated": [
+            "no_constraint_enforcement"
+          ]
+        }
+      },
+      "title": {
+        "text": "Tipping the Velvet",
+        "bbox": [
+          200,
+          50,
+          600,
+          40
+        ],
+        "confidence": -29.666666666666668,
+        "proof": {
+          "reasoning": "greedy",
+          "constraints": [],
+          "violated": [
+            "no_constraint_enforcement"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 266,
+      "history_mean": 4.17400936739571,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:46:17.086199Z"
+    },
+    "timestamp_utc": "2026-03-05T19:46:17.086199Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 267,
+      "history_mean": 4.1583763735103325,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:46:28.499960Z"
+    },
+    "timestamp_utc": "2026-03-05T19:46:28.499960Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 268,
+      "history_mean": 4.142860043758429,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:48:25.591189Z"
+    },
+    "timestamp_utc": "2026-03-05T19:48:25.591189Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 269,
+      "history_mean": 4.127459077053007,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:49:05.364028Z"
+    },
+    "timestamp_utc": "2026-03-05T19:49:05.364028Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 10.333333333333334,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 270,
+      "history_mean": 4.11217219158244,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:52:25.146374Z"
+    },
+    "timestamp_utc": "2026-03-05T19:52:25.146374Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Online Marketing for Busy Authors: A Home",
+        "bbox": [
+          615.0,
+          218.0,
+          490.0,
+          33.0
+        ],
+        "confidence": 30.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "In stock (16 available)",
+        "bbox": [
+          629.0,
+          372.0,
+          140.0,
+          16.0
+        ],
+        "confidence": 40.333333333333336,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 271,
+      "history_mean": 4.09699812445483,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T19:57:34.026030Z"
+    },
+    "timestamp_utc": "2026-03-05T19:57:34.026030Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Forever and Forever: The Courtship of Home",
+        "bbox": [
+          615.0,
+          218.0,
+          513.0,
+          33.0
+        ],
+        "confidence": 30.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "In stock (16 available)",
+        "bbox": [
+          629.0,
+          372.0,
+          140.0,
+          16.0
+        ],
+        "confidence": 40.333333333333336,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 272,
+      "history_mean": 4.081935631350215,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:37.116761Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:37.116761Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 273,
+      "history_mean": 4.066983486180434,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:37.738421Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:37.738421Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/sophies-world_966/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/sophies-world_966/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 274,
+      "history_mean": 4.052140480756418,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:38.347905Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:38.347905Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/at-the-existentialist-cafe-freedom-being-and-apricot-cocktails-with-jean-paul-sartre-simone-de-beauvoir-albert-camus-martin-heidegger-edmund-husserl-karl-jaspers-maurice-merleau-ponty-and-others_459/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/at-the-existentialist-cafe-freedom-being-and-apricot-cocktails-with-jean-paul-sartre-simone-de-beauvoir-albert-camus-martin-heidegger-edmund-husserl-karl-jaspers-maurice-merleau-ponty-and-others_459/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 275,
+      "history_mean": 4.037405424462759,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:38.913651Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:38.913651Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 276,
+      "history_mean": 4.022777143939343,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:39.454877Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:39.454877Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/no-one-here-gets-out-alive_336/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/no-one-here-gets-out-alive_336/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 277,
+      "history_mean": 4.008254482769887,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:40.045508Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:40.045508Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-book-of-basketball-the-nba-according-to-the-sports-guy_232/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-book-of-basketball-the-nba-according-to-the-sports-guy_232/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 278,
+      "history_mean": 3.9938363011771894,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:40.629416Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:40.629416Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 279,
+      "history_mean": 3.9795214757249413,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:41.153057Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:41.153057Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/little-red_817/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/little-red_817/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 280,
+      "history_mean": 3.9653088990259238,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:41.728025Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:41.728025Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/once-was-a-time_724/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/once-was-a-time_724/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 281,
+      "history_mean": 3.9511974794564364,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:42.294339Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:42.294339Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-lonely-ones_261/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-lonely-ones_261/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 282,
+      "history_mean": 3.9371861408768036,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:42.770420Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:42.770420Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-book-of-mormon_571/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-book-of-mormon_571/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 283,
+      "history_mean": 3.9232738223578045,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:43.354432Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:43.354432Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/choosing-our-religion-the-spiritual-lives-of-americas-nones_14/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/choosing-our-religion-the-spiritual-lives-of-americas-nones_14/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 284,
+      "history_mean": 3.9094594779128826,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:43.921495Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:43.921495Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/dark-notes_800/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/dark-notes_800/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 285,
+      "history_mean": 3.895742076235995,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:44.441937Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:44.441937Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/rich-dad-poor-dad_483/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/rich-dad-poor-dad_483/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 286,
+      "history_mean": 3.8821206004449604,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:44.933076Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:44.933076Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/rework_212/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/rework_212/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 287,
+      "history_mean": 3.8685940478301695,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:45.434393Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:45.434393Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/born-for-this-how-to-find-the-work-you-were-meant-to-do_588/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/born-for-this-how-to-find-the-work-you-were-meant-to-do_588/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 288,
+      "history_mean": 3.855161429608537,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:45.958492Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:45.958492Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/meditations_33/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/meditations_33/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 289,
+      "history_mean": 3.841821770682556,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:46.463126Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:46.463126Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/beyond-good-and-evil_6/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/beyond-good-and-evil_6/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 290,
+      "history_mean": 3.82857410940434,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:47.009077Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:47.009077Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/close-to-you_798/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/close-to-you_798/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 291,
+      "history_mean": 3.8154174973445314,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:47.595638Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:47.595638Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/redeeming-love_826/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/redeeming-love_826/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 292,
+      "history_mean": 3.802350999065954,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:48.196580Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:48.196580Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/in-her-wake_980/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/in-her-wake_980/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 293,
+      "history_mean": 3.7893736919019068,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:48.778702Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:48.778702Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-travelers_285/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-travelers_285/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 294,
+      "history_mean": 3.776484665738975,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:49.364632Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:49.364632Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/give-it-back_430/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/give-it-back_430/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 295,
+      "history_mean": 3.7636830228042664,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:49.956454Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:49.956454Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-long-shadow-of-small-ghosts-murder-and-memory-in-an-american-city_848/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-long-shadow-of-small-ghosts-murder-and-memory-in-an-american-city_848/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 296,
+      "history_mean": 3.750967877456955,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:50.551174Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:50.551174Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 297,
+      "history_mean": 3.7383383559840357,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:51.146406Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:51.146406Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/set-me-free_988/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/set-me-free_988/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 298,
+      "history_mean": 3.7257935964001967,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:51.696640Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:51.696640Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/my-kind-of-crazy_718/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/my-kind-of-crazy_718/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 299,
+      "history_mean": 3.7133327482517013,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:52.219689Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:52.219689Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-darkest-lie_747/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-darkest-lie_747/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 300,
+      "history_mean": 3.7009549724241952,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:52.699653Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:52.699653Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-alien-club_569/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-alien-club_569/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 301,
+      "history_mean": 3.6886594409543476,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:53.198632Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:53.198632Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/wild-swans_782/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/wild-swans_782/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 302,
+      "history_mean": 3.6764453368452275,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:53.747705Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:53.747705Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/two-boys-kissing_294/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/two-boys-kissing_294/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 303,
+      "history_mean": 3.664311853885342,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:54.273926Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:54.273926Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/isla-and-the-happily-ever-after-anna-and-the-french-kiss-3_380/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/isla-and-the-happily-ever-after-anna-and-the-french-kiss-3_380/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 304,
+      "history_mean": 3.6522581964712457,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:54.786885Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:54.786885Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tell-me-three-things_395/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tell-me-three-things_395/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 305,
+      "history_mean": 3.640283579433635,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:55.303922Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:55.303922Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-darkest-corners_399/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-darkest-corners_399/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 306,
+      "history_mean": 3.6283872278668583,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:55.890570Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:55.890570Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-loney_756/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-loney_756/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 307,
+      "history_mean": 3.6165683769617547,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:56.469587Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:56.469587Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/needful-things_334/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/needful-things_334/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 308,
+      "history_mean": 3.6048262718417488,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:57.068298Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:57.068298Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/it_330/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/it_330/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 309,
+      "history_mean": 3.5931601674021314,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:57.585083Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:57.585083Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/misery_332/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/misery_332/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 310,
+      "history_mean": 3.581569328152447,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:58.086404Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:58.086404Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-stand_282/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-stand_282/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 311,
+      "history_mean": 3.570053028061925,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:58.681066Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:58.681066Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/salems-lot_309/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/salems-lot_309/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 312,
+      "history_mean": 3.5586105504078804,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:59.251687Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:59.251687Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/house-of-leaves_169/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/house-of-leaves_169/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 313,
+      "history_mean": 3.5472411876270242,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:02:59.776227Z"
+    },
+    "timestamp_utc": "2026-03-05T20:02:59.776227Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/fifty-shades-freed-fifty-shades-3_156/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 314,
+      "history_mean": 3.5359442411696134,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:00.352523Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:00.352523Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/a-walk-to-remember_312/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/a-walk-to-remember_312/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 315,
+      "history_mean": 3.524719021356377,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:00.839997Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:00.839997Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/sit-stay-love_486/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/sit-stay-love_486/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 316,
+      "history_mean": 3.51356484723816,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:01.366960Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:01.366960Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/dirty-dive-bar-1_615/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/dirty-dive-bar-1_615/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 317,
+      "history_mean": 3.502481046458229,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:01.910670Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:01.910670Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/unicorn-tracks_951/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/unicorn-tracks_951/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 318,
+      "history_mean": 3.4914669551171653,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:02.438475Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:02.438475Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/masks-and-shadows_909/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/masks-and-shadows_909/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 319,
+      "history_mean": 3.480521917640309,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:02.920037Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:02.920037Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-star-touched-queen_642/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-star-touched-queen_642/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 320,
+      "history_mean": 3.4696452866476832,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:03.436650Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:03.436650Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/soldier-talon-3_222/index.html",
+    "stability_score": 0.0,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/soldier-talon-3_222/index.html",
+      "stability": 0.0,
+      "stability_threshold": 0.6,
+      "history_size": 321,
+      "history_mean": 3.458836422826351,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:03:03.936266Z"
+    },
+    "timestamp_utc": "2026-03-05T20:03:03.936266Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          200,
+          120,
+          100,
+          30
+        ],
+        "confidence": 20.333333333333332,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "Add to basket",
+        "bbox": [
+          200,
+          200,
+          150,
+          40
+        ],
+        "confidence": 5.333333333333333,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.588342851812118,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.588342851812118,
+      "stability_threshold": 0.6,
+      "history_size": 326,
+      "history_mean": 3.41792012734463,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:50:14.692544Z"
+    },
+    "timestamp_utc": "2026-03-05T20:50:14.692544Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Tipping the Velvet Home",
+        "bbox": [
+          615.0,
+          218.0,
+          238.0,
+          33.0
+        ],
+        "confidence": 30.105697631835938,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88359069824219,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
   }
 ]

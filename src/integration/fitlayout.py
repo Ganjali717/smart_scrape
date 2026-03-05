@@ -173,26 +173,61 @@ class FitLayoutClient:
             response = self.session.get(url)
             response.raise_for_status()
 
-            return response.json()
+            data = response.json()
+
+            # DEBUG
+            graphs = data.get("@graph", []) if isinstance(data, dict) else []
+            print(f"[DEBUG] @graph length: {len(graphs)}")
+            for i, g in enumerate(graphs[:8]):
+                gid   = g.get("@id", "?")
+                gtype = g.get("@type", "?")
+                keys  = list(g.keys())
+                has_bounds = any("bounds" in k for k in keys)
+                inner = g.get("@graph", [])
+                print(f"[DEBUG] [{i}] id={gid} type={gtype} keys={keys[:6]} bounds={has_bounds} inner={len(inner)}")
+                if inner:
+                    for j, item in enumerate(inner[:3]):
+                        ikeys = list(item.keys())
+                        ib = any("bounds" in k for k in ikeys)
+                        print(f"[DEBUG]   inner[{j}] id={item.get('@id')} keys={ikeys[:6]} bounds={ib}")
+
+            return data
 
         except requests.RequestException as e:
             raise RuntimeError(f"[FitLayout] Connection failed: {e}") from e
 
+    # --------- segmentation ---------
+
+    def _create_segmentation(self, render_uri: str) -> str:
+        """Run VIPS segmentation on render artifact."""
+        self._ensure_repo()
+        url = f"{self.base_url}/r/{self.repo_id}/artifact/create"
+        payload = {
+            "serviceId": SERVICE_SEGMENTATION_ID,
+            "params": {"threshold": 0.3, "pDoC": 10},
+            "parentIri": render_uri,
+        }
+        response = self.session.post(url, json=payload, headers={
+            "Content-Type": "application/json",
+            "Accept": "*/*",
+            "Authorization": SERVICE_AUTH_TOKEN,
+        })
+        response.raise_for_status()
+        data = response.json()
+        if data.get("status") != "ok":
+            raise RuntimeError(f"[FitLayout] Segmentation failed: {data}")
+        return data["result"]
+
     # --------- high-level API ---------
 
-    def get_page_content(
-        self, page_url: str, service_id: str = SERVICE_RENDER_ID
-    ) -> Dict[str, Any]:
-        """
-        1) Checks if an artifact exists for the given page_url.
-        2) If it exists, retrieves its content.
-        3) If not, creates an artifact using the specified service_id and then retrieves the content.
-        """
-        artifact_uri = self.check_artifact(page_url)
-        if not artifact_uri:
-            artifact_uri = self.create_artifact(service_id, page_url)
-
-        return self.get_artifact_content(artifact_uri)
+    def get_page_content(self, page_url: str, service_id: str = SERVICE_RENDER_ID) -> Dict[str, Any]:
+        # Render only — contains both coordinates (b:bounds) and text (b:text)
+        render_uri = self.check_artifact(page_url)
+        if not render_uri:
+            print(f"[FitLayout] Rendering: {page_url}")
+            render_uri = self.create_artifact(SERVICE_RENDER_ID, page_url)
+        print(f"[FitLayout] Render: {render_uri}")
+        return self.get_artifact_content(render_uri)
 
 
 if __name__ == "__main__":

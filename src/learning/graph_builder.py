@@ -55,7 +55,13 @@ class FitLayoutParser:
                 if not isinstance(item, dict):
                     continue
 
-                bounds_ref = self._find_key_ending_with(item, "bounds")
+                # ── FIX: get raw bounds value (dict or str), NOT converted to string ──
+                bounds_ref = None
+                for k, v in item.items():
+                    if k.endswith("bounds"):
+                        bounds_ref = v  # keep as-is: may be {'@id': '...'} or str
+                        break
+
                 if not bounds_ref:
                     continue
 
@@ -69,6 +75,12 @@ class FitLayoutParser:
         print(
             f"[GraphBuilder] Found {len(extracted_items)} elements with coordinates."
         )
+
+        # DEBUG — покажи первые 3 ноды полностью
+        for idx, (item, x, y, w, h) in enumerate(extracted_items[:3]):
+            print(f"[DEBUG NODE {idx}] bbox=({x},{y},{w},{h}) keys={list(item.keys())}")
+            for k, v in item.items():
+                print(f"  {k}: {str(v)[:80]}")
 
         # 3. Create features for each element
         for item, x, y, w, h in extracted_items:
@@ -104,7 +116,6 @@ class FitLayoutParser:
             return None, None
 
         x_tensor = torch.stack(nodes)
-        # edge_index = self._build_knn_edges(raw_nodes, k=3)
         edge_index = self._build_hybrid_edges(raw_nodes, k=3)
         data = Data(x=x_tensor, edge_index=edge_index)
 
@@ -113,12 +124,14 @@ class FitLayoutParser:
     # --------- helpers ---------
 
     def _find_key_ending_with(self, d: dict, suffix: str) -> str | None:
-        """Finds a value by key suffix (b:text, b:htmlTagName, b:bounds, etc.)."""
+        """Finds a value by key suffix (b:text, b:htmlTagName, etc.)."""
         for k, v in d.items():
             if k.endswith(suffix):
                 # FitLayout values often come wrapped in {"@value": "..."} — unwrap it
                 if isinstance(v, dict) and "@value" in v:
                     return str(v["@value"])
+                if isinstance(v, dict):
+                    return None  # don't stringify dicts (e.g. bounds refs)
                 return str(v)
         return None
 
@@ -136,13 +149,12 @@ class FitLayoutParser:
             coords = self._parse_coords_string(bounds_ref)
             if coords:
                 return coords
-
             rect = id_index.get(bounds_ref)
             if rect:
                 return self._bbox_from_rect(rect)
             return None
 
-        # variant 2: dict
+        # variant 2: dict {"@id": "r:art157#a1-rect-b"}
         if isinstance(bounds_ref, dict):
             if "@id" in bounds_ref:
                 rect = id_index.get(bounds_ref["@id"], bounds_ref)
@@ -191,7 +203,6 @@ class FitLayoutParser:
                 continue
             if not str(item.get("@type", "")).endswith("Page"):
                 continue
-
             w = self._get_numeric(item, "width")
             h = self._get_numeric(item, "height")
             if w:
@@ -216,17 +227,14 @@ class FitLayoutParser:
         for i in range(num_nodes):
             dists = []
             xi, yi, _, _ = nodes_info[i]["bbox"]
-
             for j in range(num_nodes):
                 if i == j:
                     continue
                 xj, yj, _, _ = nodes_info[j]["bbox"]
                 dist = ((xi - xj) ** 2 + (yi - yj) ** 2) ** 0.5
                 dists.append((dist, j))
-
             dists.sort(key=lambda x: x[0])
             for _, neighbor_idx in dists[:k]:
-                # Make the graph undirected: add edges in both directions
                 edges.append([i, neighbor_idx])
                 edges.append([neighbor_idx, i])
 
@@ -237,7 +245,7 @@ class FitLayoutParser:
         """
         Builds a graph combining:
         1. KNN (visual proximity)
-        2. Containment (nesting/hierarchy) - key for the paper
+        2. Containment (nesting/hierarchy)
         """
         edges = []
         num_nodes = len(nodes_info)
@@ -247,42 +255,32 @@ class FitLayoutParser:
         for i in range(num_nodes):
             xi, yi, wi, hi = nodes_info[i]["bbox"]
 
-            # --- 1. KNN Edges (Local context) ---
+            # --- 1. KNN Edges ---
             dists = []
             for j in range(num_nodes):
                 if i == j:
                     continue
                 xj, yj, _, _ = nodes_info[j]["bbox"]
-                # Euclidean distance
                 dist = ((xi - xj) ** 2 + (yi - yj) ** 2) ** 0.5
                 dists.append((dist, j))
-
             dists.sort(key=lambda x: x[0])
             for _, neighbor_idx in dists[:k]:
                 edges.append([i, neighbor_idx])
 
-            # --- 2. Containment Edges (Hierarchical context) ---
-            # This implements the "Visual grouping" logic from FitLayout
+            # --- 2. Containment Edges ---
             for j in range(num_nodes):
                 if i == j:
                     continue
                 xj, yj, wj, hj = nodes_info[j]["bbox"]
-
-                # Check if node J is inside node I (Parent -> Child)
-                # Add a small tolerance (epsilon) for fuzzy boundaries
                 if (
                     (xi <= xj)
                     and (yi <= yj)
                     and (xi + wi >= xj + wj)
                     and (yi + hi >= yj + hj)
                 ):
-                    edges.append([i, j])  # Parent -> Child
-                    edges.append(
-                        [j, i]
-                    )  # Child -> Parent (for backward message passing)
+                    edges.append([i, j])
+                    edges.append([j, i])
 
-        # Remove duplicate edges
         edges = list(set(tuple(e) for e in edges))
-
         edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
         return edge_index

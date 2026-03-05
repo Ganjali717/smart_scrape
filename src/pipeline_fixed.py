@@ -51,7 +51,7 @@ class SmartScrapePipeline:
     def __init__(
         self,
         reasoning_mode: ReasoningMode = "ilp",
-        use_mock: bool = True,
+        use_mock: bool = False,
     ):
         torch.manual_seed(42)
         np.random.seed(42)
