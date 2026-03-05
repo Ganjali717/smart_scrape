@@ -34,7 +34,7 @@ with st.sidebar:
         ["ilp", "greedy"],
         format_func=lambda x: "ILP (Constraint Solver)" if x == "ilp" else "Greedy (Ablation Baseline)",
     )
-    allow_mock = st.checkbox("Allow mock data (offline mode)", value=True)
+    #allow_mock = st.checkbox("Allow mock data (offline mode)", value=True)
     st.divider()
 
     if mode == "🔴 Live Extraction":

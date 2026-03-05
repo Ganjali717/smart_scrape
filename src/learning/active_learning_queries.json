@@ -14478,5 +14478,1067 @@
         }
       }
     }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+    "stability_score": 0.4416606115759927,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+      "stability": 0.4416606115759927,
+      "stability_threshold": 0.6,
+      "history_size": 327,
+      "history_mean": 3.4088184162872337,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:11.559336Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:11.559336Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Henry Longfellow and Fanny Appleton Forever and Forever: The Courtship of",
+        "bbox": [
+          615.0,
+          257.0,
+          509.0,
+          33.0
+        ],
+        "confidence": 30.191303253173828,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a329.69",
+        "bbox": [
+          615.0,
+          316.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.84016036987305,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+    "stability_score": 0.4253927793734738,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+      "stability": 0.4253927793734738,
+      "stability_threshold": 0.6,
+      "history_size": 328,
+      "history_mean": 3.399722606418594,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:15.735596Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:15.735596Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Step-By-Step Guide Online Marketing for Busy Authors: A",
+        "bbox": [
+          615.0,
+          257.0,
+          268.0,
+          33.0
+        ],
+        "confidence": 30.286577224731445,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a346.35",
+        "bbox": [
+          615.0,
+          316.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.8050537109375,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/sophies-world_966/index.html",
+    "stability_score": 0.43758622215984644,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/sophies-world_966/index.html",
+      "stability": 0.43758622215984644,
+      "stability_threshold": 0.6,
+      "history_size": 329,
+      "history_mean": 3.390719152363096,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:19.458690Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:19.458690Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Sophie's World Home",
+        "bbox": [
+          615.0,
+          218.0,
+          201.0,
+          33.0
+        ],
+        "confidence": 30.122819900512695,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a315.94",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.853965759277344,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/at-the-existentialist-cafe-freedom-being-and-apricot-cocktails-with-jean-paul-sartre-simone-de-beauvoir-albert-camus-martin-heidegger-edmund-husserl-karl-jaspers-maurice-merleau-ponty-and-others_459/index.html",
+    "stability_score": 0.4706452996741751,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/at-the-existentialist-cafe-freedom-being-and-apricot-cocktails-with-jean-paul-sartre-simone-de-beauvoir-albert-camus-martin-heidegger-edmund-husserl-karl-jaspers-maurice-merleau-ponty-and-others_459/index.html",
+      "stability": 0.4706452996741751,
+      "stability_threshold": 0.6,
+      "history_size": 330,
+      "history_mean": 3.3818704437185847,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:23.202220Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:23.202220Z",
+    "prediction_summary": {
+      "title": {
+        "text": "At The Existentialist Caf\u00e9: Freedom, Being, and apricot cocktails with: Jean-Paul Sartre, Simone de Beauvoir, Albert Camus, Martin Heidegger, Edmund Husserl, Karl  Home",
+        "bbox": [
+          78.0,
+          189.0,
+          1023.0,
+          16.0
+        ],
+        "confidence": 30.318756103515625,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+    "stability_score": 0.4607684704451614,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+      "stability": 0.4607684704451614,
+      "stability_threshold": 0.6,
+      "history_size": 331,
+      "history_mean": 3.3730453622283325,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:26.881532Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:26.881532Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Rip it Up and Start Again Home",
+        "bbox": [
+          615.0,
+          218.0,
+          330.0,
+          33.0
+        ],
+        "confidence": 30.151885986328125,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a335.02",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.813419342041016,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/no-one-here-gets-out-alive_336/index.html",
+    "stability_score": 0.4589133513372865,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/no-one-here-gets-out-alive_336/index.html",
+      "stability": 0.4589133513372865,
+      "stability_threshold": 0.6,
+      "history_size": 332,
+      "history_mean": 3.364267856171432,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:30.474757Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:30.474757Z",
+    "prediction_summary": {
+      "title": {
+        "text": "No One Here Gets Out Alive Home",
+        "bbox": [
+          615.0,
+          218.0,
+          378.0,
+          33.0
+        ],
+        "confidence": 30.17540168762207,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a320.02",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.81998825073242,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-book-of-basketball-the-nba-according-to-the-sports-guy_232/index.html",
+    "stability_score": 0.464181114728297,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-book-of-basketball-the-nba-according-to-the-sports-guy_232/index.html",
+      "stability": 0.464181114728297,
+      "stability_threshold": 0.6,
+      "history_size": 333,
+      "history_mean": 3.3555588869779087,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:34.227720Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:34.227720Z",
+    "prediction_summary": {
+      "title": {
+        "text": "According to The Sports Guy The Book of Basketball: The NBA",
+        "bbox": [
+          615.0,
+          257.0,
+          386.0,
+          33.0
+        ],
+        "confidence": 30.202556610107422,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a344.84",
+        "bbox": [
+          615.0,
+          316.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88591003417969,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+    "stability_score": 0.46349047646513586,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+      "stability": 0.46349047646513586,
+      "stability_threshold": 0.6,
+      "history_size": 334,
+      "history_mean": 3.346899999521284,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:52:38.059722Z"
+    },
+    "timestamp_utc": "2026-03-05T20:52:38.059722Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a340.44",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88404846191406,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "here were randomly assigned and have no real meaning. Warning!",
+        "bbox": [
+          631.0,
+          470.0,
+          353.0,
+          16.0
+        ],
+        "confidence": 0.27587074041366577,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+    "stability_score": 0.4416606115759927,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/forever-and-forever-the-courtship-of-henry-longfellow-and-fanny-appleton_894/index.html",
+      "stability": 0.4416606115759927,
+      "stability_threshold": 0.6,
+      "history_size": 335,
+      "history_mean": 3.338227643139357,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:39.399568Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:39.399568Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Henry Longfellow and Fanny Appleton Forever and Forever: The Courtship of",
+        "bbox": [
+          615.0,
+          257.0,
+          509.0,
+          33.0
+        ],
+        "confidence": 30.191303253173828,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a329.69",
+        "bbox": [
+          615.0,
+          316.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.84016036987305,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+    "stability_score": 0.4253927793734738,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/online-marketing-for-busy-authors-a-step-by-step-guide_913/index.html",
+      "stability": 0.4253927793734738,
+      "stability_threshold": 0.6,
+      "history_size": 336,
+      "history_mean": 3.3295584917591023,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:39.648831Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:39.648831Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Step-By-Step Guide Online Marketing for Busy Authors: A",
+        "bbox": [
+          615.0,
+          257.0,
+          268.0,
+          33.0
+        ],
+        "confidence": 30.286577224731445,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a346.35",
+        "bbox": [
+          615.0,
+          316.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.8050537109375,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/sophies-world_966/index.html",
+    "stability_score": 0.43758622215984644,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/sophies-world_966/index.html",
+      "stability": 0.43758622215984644,
+      "stability_threshold": 0.6,
+      "history_size": 337,
+      "history_mean": 3.320976971671271,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:39.904030Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:39.904030Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Sophie's World Home",
+        "bbox": [
+          615.0,
+          218.0,
+          201.0,
+          33.0
+        ],
+        "confidence": 30.122819900512695,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a315.94",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.853965759277344,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/at-the-existentialist-cafe-freedom-being-and-apricot-cocktails-with-jean-paul-sartre-simone-de-beauvoir-albert-camus-martin-heidegger-edmund-husserl-karl-jaspers-maurice-merleau-ponty-and-others_459/index.html",
+    "stability_score": 0.4706452996741751,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/at-the-existentialist-cafe-freedom-being-and-apricot-cocktails-with-jean-paul-sartre-simone-de-beauvoir-albert-camus-martin-heidegger-edmund-husserl-karl-jaspers-maurice-merleau-ponty-and-others_459/index.html",
+      "stability": 0.4706452996741751,
+      "stability_threshold": 0.6,
+      "history_size": 338,
+      "history_mean": 3.3125440377304507,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:40.124093Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:40.124093Z",
+    "prediction_summary": {
+      "title": {
+        "text": "At The Existentialist Caf\u00e9: Freedom, Being, and apricot cocktails with: Jean-Paul Sartre, Simone de Beauvoir, Albert Camus, Martin Heidegger, Edmund Husserl, Karl  Home",
+        "bbox": [
+          78.0,
+          189.0,
+          1023.0,
+          16.0
+        ],
+        "confidence": 30.318756103515625,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+    "stability_score": 0.4607684704451614,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+      "stability": 0.4607684704451614,
+      "stability_threshold": 0.6,
+      "history_size": 339,
+      "history_mean": 3.3041317204228244,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:40.346627Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:40.346627Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Rip it Up and Start Again Home",
+        "bbox": [
+          615.0,
+          218.0,
+          330.0,
+          33.0
+        ],
+        "confidence": 30.151885986328125,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a335.02",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.813419342041016,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/no-one-here-gets-out-alive_336/index.html",
+    "stability_score": 0.4589133513372865,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/no-one-here-gets-out-alive_336/index.html",
+      "stability": 0.4589133513372865,
+      "stability_threshold": 0.6,
+      "history_size": 340,
+      "history_mean": 3.2957634311019848,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:40.568155Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:40.568155Z",
+    "prediction_summary": {
+      "title": {
+        "text": "No One Here Gets Out Alive Home",
+        "bbox": [
+          615.0,
+          218.0,
+          378.0,
+          33.0
+        ],
+        "confidence": 30.17540168762207,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a320.02",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.81998825073242,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/the-book-of-basketball-the-nba-according-to-the-sports-guy_232/index.html",
+    "stability_score": 0.464181114728297,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/the-book-of-basketball-the-nba-according-to-the-sports-guy_232/index.html",
+      "stability": 0.464181114728297,
+      "stability_threshold": 0.6,
+      "history_size": 341,
+      "history_mean": 3.2874596706434107,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:40.796700Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:40.796700Z",
+    "prediction_summary": {
+      "title": {
+        "text": "According to The Sports Guy The Book of Basketball: The NBA",
+        "bbox": [
+          615.0,
+          257.0,
+          386.0,
+          33.0
+        ],
+        "confidence": 30.202556610107422,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a344.84",
+        "bbox": [
+          615.0,
+          316.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88591003417969,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+    "stability_score": 0.46349047646513586,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/icing-aces-hockey-2_25/index.html",
+      "stability": 0.46349047646513586,
+      "stability_threshold": 0.6,
+      "history_size": 342,
+      "history_mean": 3.279202450777393,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:41.027069Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:41.027069Z",
+    "prediction_summary": {
+      "price": {
+        "text": "\u00a340.44",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88404846191406,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "title": {
+        "text": "here were randomly assigned and have no real meaning. Warning!",
+        "bbox": [
+          631.0,
+          470.0,
+          353.0,
+          16.0
+        ],
+        "confidence": 0.27587074041366577,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/little-red_817/index.html",
+    "stability_score": 0.47004594631465685,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/little-red_817/index.html",
+      "stability": 0.47004594631465685,
+      "stability_threshold": 0.6,
+      "history_size": 343,
+      "history_mean": 3.271012490122982,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:44.745410Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:44.745410Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Little Red Home",
+        "bbox": [
+          615.0,
+          218.0,
+          127.0,
+          33.0
+        ],
+        "confidence": 30.121017456054688,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a313.47",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.885005950927734,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/once-was-a-time_724/index.html",
+    "stability_score": 0.496099579213879,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/once-was-a-time_724/index.html",
+      "stability": 0.496099579213879,
+      "stability_threshold": 0.6,
+      "history_size": 344,
+      "history_mean": 3.262945882823828,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:53:48.464604Z"
+    },
+    "timestamp_utc": "2026-03-05T20:53:48.464604Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Once Was a Time Home",
+        "bbox": [
+          615.0,
+          218.0,
+          238.0,
+          33.0
+        ],
+        "confidence": 30.05545997619629,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a318.28",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.933067321777344,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.588342851812118,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.588342851812118,
+      "stability_threshold": 0.6,
+      "history_size": 345,
+      "history_mean": 3.2551934102701705,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T20:55:50.247186Z"
+    },
+    "timestamp_utc": "2026-03-05T20:55:50.247186Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Tipping the Velvet Home",
+        "bbox": [
+          615.0,
+          218.0,
+          238.0,
+          33.0
+        ],
+        "confidence": 30.105697631835938,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88359069824219,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/mrs-houdini_821/index.html",
+    "stability_score": 0.4550813210797841,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/mrs-houdini_821/index.html",
+      "stability": 0.4550813210797841,
+      "stability_threshold": 0.6,
+      "history_size": 346,
+      "history_mean": 3.24710060076384,
+      "drift_detected": true,
+      "timestamp": "2026-03-05T21:00:11.889024Z"
+    },
+    "timestamp_utc": "2026-03-05T21:00:11.889024Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Mrs. Houdini Home",
+        "bbox": [
+          615.0,
+          218.0,
+          169.0,
+          33.0
+        ],
+        "confidence": 30.152141571044922,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a330.25",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.861976623535156,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
   }
 ]
