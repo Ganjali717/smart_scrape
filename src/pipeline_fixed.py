@@ -23,7 +23,7 @@ from src.learning.features import FeatureEncoder
 from src.learning.graph_builder import FitLayoutParser
 from src.learning.gnn_model import SmartScrapeGNN
 from src.learning.drift_monitor import DriftMonitor, ActiveLearningManager
-from src.reasoning.solver import ConstraintSolver
+from src.reasoning.solver_fixed import ConstraintSolver
 from config import FOOTER_THRESHOLD, STABILITY_THRESHOLD, MODEL_CHECKPOINT
 
 
@@ -240,40 +240,63 @@ class SmartScrapePipeline:
         """
         Inject domain-knowledge priors into the score matrix.
 
-        These implement the 'Heuristic prior' part of the hybrid model:
-        they provide strong signals for known patterns (currency symbols,
-        H1 tags) that are stable across template drift.
+        Implements the 'Heuristic prior' part of the hybrid model:
+        strong signals for known patterns (currency, H1 tags, y-position).
         """
+        page_h = self._estimate_page_height(raw_nodes)
+
         for i, node in enumerate(raw_nodes):
-            text = node.get("text", "").strip()
-            tag = node.get("tag", "").lower()
-            bbox = node.get("bbox", [0, 0, 0, 0])
-            y_coord = float(bbox[1])
+            text    = node.get("text", "").strip()
+            tag     = node.get("tag", "").lower()
+            bbox    = node.get("bbox", [0, 0, 0, 0])
+            y_coord = float(bbox[1]) if bbox and len(bbox) > 1 else 0.0
 
             if len(text) < 1:
-                scores[i][0] = -100.0  # price
-                scores[i][1] = -100.0  # title
+                scores[i][0] = -100.0
+                scores[i][1] = -100.0
                 continue
 
-            # --- TITLE heuristics (index 1) ---
-            if tag == "h1":
-                scores[i][1] += 30.0          # H1 is a very strong title signal
-            elif tag in ("h2", "h3"):
-                scores[i][1] += 10.0
-            elif y_coord < 400 and 5 < len(text) < 150:
-                scores[i][1] += 5.0            # prominent short text near top
-
-            # --- PRICE heuristics (index 0) ---
-            if self.PRICE_PATTERN.search(text) and len(text) < 25:
-                scores[i][0] += 20.0           # currency pattern in short text
+            # --- PRICE (index 0) ---
+            has_currency = self.PRICE_PATTERN.search(text) and len(text) < 25
+            if has_currency and 150 <= y_coord <= 500:
+                scores[i][0] += 40.0   # цена в зоне продукта
+            elif has_currency:
+                scores[i][0] += 10.0   # цена но не в зоне
             else:
-                scores[i][0] -= 5.0
+                scores[i][0] -= 20.0   # нет валютного символа — не цена
 
-            # --- Footer penalty (Γ2 pre-filter) ---
-            page_h = self._estimate_page_height(raw_nodes)
+            # --- TITLE (index 1) ---
+            is_price_text = bool(self.PRICE_PATTERN.search(text))
+            STOP_WORDS = {
+                "warning", "notice", "in stock", "add to basket",
+                "add to cart", "home", "sign in", "register",
+                "this is a demo", "prices and ratings",
+            }
+            is_nav_text = (
+                "/" in text
+                or text.isdigit()
+                or any(s in text.lower() for s in STOP_WORDS)
+                or len(text) < 3
+            )
+
+            if is_price_text:
+                scores[i][1] -= 50.0   # цена не может быть заголовком
+            elif is_nav_text:
+                scores[i][1] -= 50.0   # навигация/статус не заголовок
+            elif 185 <= y_coord <= 400 and 2 <= len(text) <= 200:
+                scores[i][1] += 30.0   # текст в зоне заголовка
+                if tag == "h1":
+                    scores[i][1] += 20.0
+            elif y_coord < 185:
+                scores[i][1] -= 30.0   # шапка сайта
+
+            # --- Зональные штрафы ---
+            if y_coord > 500:
+                scores[i][0] -= 40.0
+                scores[i][1] -= 40.0
             if y_coord > page_h * FOOTER_THRESHOLD:
-                scores[i][1] -= 30.0
                 scores[i][0] -= 30.0
+                scores[i][1] -= 30.0
 
     # ------------------------------------------------------------------
     # Phase 4a: ILP reasoning
@@ -299,6 +322,26 @@ class SmartScrapePipeline:
                     "violated": [],
                 },
             }
+
+        # Merge split titles: FitLayout sometimes splits long titles into 2 nodes
+        if "title" in record:
+            title_y = record["title"]["bbox"][1] if record["title"]["bbox"] else 0
+            title_text = record["title"]["text"]
+            price_text = record.get("price", {}).get("text", "")
+
+            for node in raw_nodes:
+                ny    = node["bbox"][1] if node.get("bbox") else 0
+                text  = node.get("text", "").strip()
+                if (
+                    abs(ny - title_y) <= 60
+                    and text != title_text
+                    and text != price_text
+                    and not self.PRICE_PATTERN.search(text)
+                    and len(text) > 2
+                ):
+                    record["title"]["text"] = title_text + " " + text
+                    break
+
         return record
 
     # ------------------------------------------------------------------

@@ -1,8 +1,27 @@
+# Core dependencies
 requests>=2.28.0
 networkx>=3.0
+numpy>=1.24.0
+scikit-learn>=1.2.0
+
+# Deep Learning
 torch>=2.0.0
 torch-geometric>=2.3.0
-numpy>=1.24.0
-ortools>=9.6
+
+# NLP
 transformers>=4.30.0
-scikit-learn>=1.2.0
+
+# Constraint Solver (OR-Tools)
+ortools>=9.6
+
+# UI & Visualization
+streamlit>=1.28.0
+matplotlib>=3.7.0
+pandas>=2.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+sentencepiece>=0.1.99
+tiktoken>=0.5.0
+protobuf>=4.23.0

@@ -14,11 +14,11 @@ from config import (
 
 class FitLayoutClient:
     """
-    Клиент для FitLayout REST API:
-    - находит репозиторий по description
-    - ищет артефакт по b:sourceUrl
-    - при необходимости создаёт артефакт
-    - возвращает содержимое артефакта
+    Client for the FitLayout REST API:
+    - finds a repository by description
+    - searches for an artifact by b:sourceUrl
+    - creates an artifact if necessary
+    - returns the artifact content
     """
 
     def __init__(self):
@@ -68,8 +68,8 @@ class FitLayoutClient:
 
     def check_artifact(self, page_url: str) -> Optional[str]:
         """
-        Ищет артефакт с данным b:sourceUrl.
-        Возвращает полный URI артефакта (http://fitlayout.github.io/resource/artXX) или None.
+        Searches for an artifact with the given b:sourceUrl.
+        Returns the full artifact URI (http://fitlayout.github.io/resource/artXX) or None.
         """
         self._ensure_repo()
 
@@ -108,9 +108,9 @@ class FitLayoutClient:
 
     def create_artifact(self, service_id: str, page_url: str) -> str:
         """
-        Создаёт артефакт через /artifact/create.
-        Предполагаем, что сервис принимает параметры через строку params (как в fl:creatorParams).
-        Возвращает полный URI артефакта (result).
+        Creates an artifact via /artifact/create.
+        Assumes the service accepts parameters through the params dictionary (like in fl:creatorParams).
+        Returns the full artifact URI (result).
         """
         self._ensure_repo()
 
@@ -140,7 +140,7 @@ class FitLayoutClient:
 
             print(payload)
 
-            # если у тебя create работает через GET с query-параметрами — можно заменить на params=payload
+            # If your create endpoint works via GET with query parameters, you can change this to params=payload
             response = self.session.post(url, json=payload, headers=headers)
             response.raise_for_status()
 
@@ -148,7 +148,7 @@ class FitLayoutClient:
             if data.get("status") != "ok":
                 raise RuntimeError(f"[FitLayout] Artifact creation failed: {data}")
 
-            return data["result"]  # типа "http://fitlayout.github.io/resource/art66"
+            return data["result"]  # e.g., "http://fitlayout.github.io/resource/art66"
 
         except requests.RequestException as e:
             raise RuntimeError(f"[FitLayout] Connection failed: {e}") from e
@@ -157,7 +157,7 @@ class FitLayoutClient:
 
     def get_artifact_content(self, artifact_uri: str) -> Dict[str, Any]:
         """
-        Возвращает JSON-содержимое артефакта по его полному URI.
+        Returns the JSON content of the artifact by its full URI.
         """
         self._ensure_repo()
 
@@ -184,9 +184,9 @@ class FitLayoutClient:
         self, page_url: str, service_id: str = SERVICE_RENDER_ID
     ) -> Dict[str, Any]:
         """
-        1) Проверяет, есть ли артефакт для page_url.
-        2) Если есть — берёт его содержимое.
-        3) Если нет — создаёт артефакт указанным service_id и потом берёт содержимое.
+        1) Checks if an artifact exists for the given page_url.
+        2) If it exists, retrieves its content.
+        3) If not, creates an artifact using the specified service_id and then retrieves the content.
         """
         artifact_uri = self.check_artifact(page_url)
         if not artifact_uri:

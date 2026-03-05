@@ -14,9 +14,9 @@ import re
 @dataclass
 class NodeCandidate:
     """
-    Единица выбора для селектора: DOM/layout-узел с модельным скором.
+    Selection unit for the selector: DOM/layout node with a model score.
 
-    Это минимальный объект, с которым работают селекторы и ограничения.
+    This is the minimal object that selectors and constraints work with.
     """
 
     node_id: str
@@ -29,13 +29,13 @@ class NodeCandidate:
 @dataclass
 class ExtractionResult:
     """
-    Финальный результат извлечения для одного поля.
+    Final extraction result for a single field.
 
-    Поле proof содержит:
-      - "node_ids": список ID DOM-узлов, на которые опирается значение;
-      - "constraints": список имен/ID ограничений Γ, которые были соблюдены
-                       для данного поля при выбранном присваивании;
-      - "violated": (опционально) список нарушенных ограничений (для дебага).
+    The proof field contains:
+      - "node_ids": list of DOM node IDs the value is based on;
+      - "constraints": list of constraint names/IDs Γ that were satisfied
+                       for this field under the chosen assignment;
+      - "violated": (optional) list of violated constraints (for debugging).
     """
 
     field_name: str
@@ -51,17 +51,17 @@ class ExtractionResult:
 
 class Constraint(ABC):
     """
-    Абстрактный базовый класс для всех ограничений Γ.
+    Abstract base class for all constraints Γ.
 
-    Ограничение проверяется на *присваивании*:
+    A constraint is evaluated against an *assignment*:
         assignment: dict[field_name -> NodeCandidate | List[NodeCandidate] | None]
 
-    и опциональном page_context (метаданные страницы, например высота).
+    and an optional page_context (page metadata, e.g., page height).
     """
 
     def __init__(self, name: str, field_names: Optional[List[str]] = None) -> None:
         self.name = name
-        # None -> глобальное ограничение, иначе применимо только к перечисленным полям.
+        # None -> global constraint, otherwise applicable only to the listed fields.
         self.field_names = field_names
 
     def applies_to(self, field_name: str) -> bool:
@@ -74,16 +74,16 @@ class Constraint(ABC):
         page_context: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """
-        True, если ограничение удовлетворено данным присваиванием.
+        True if the constraint is satisfied by the given assignment.
         """
         raise NotImplementedError
 
 
 class UniqueConstraint(Constraint):
     """
-    Уникальность: не более max_count значений для данного поля на странице.
+    Uniqueness: no more than max_count values for the given field on the page.
 
-    Типичный кейс: "один title на страницу".
+    Typical case: "one title per page".
     """
 
     def __init__(
@@ -106,15 +106,15 @@ class UniqueConstraint(Constraint):
             return True
         if isinstance(value, list):
             return len(value) <= self.max_count
-        # Одна value – уникальность тривиально соблюдается.
+        # Single value - uniqueness is trivially satisfied.
         return True
 
 
 class FormatConstraint(Constraint):
     """
-    Простейшее форматное ограничение на основе regex.
+    Simplest format constraint based on regex.
 
-    Пример: цена должна содержать хотя бы одну цифру.
+    Example: price must contain at least one digit.
     """
 
     def __init__(
@@ -136,7 +136,7 @@ class FormatConstraint(Constraint):
     ) -> bool:
         cand = assignment.get(self.field_name)
         if cand is None:
-            # Отсутствие candidate’а не ломает формат, обязательность поля – в Field.required.
+            # Absence of a candidate doesn't break the format; field requirement is handled by Field.required.
             return True
 
         candidates: List[NodeCandidate]
@@ -156,18 +156,18 @@ class FormatConstraint(Constraint):
 
 class VisualConstraint(Constraint):
     """
-    Визуальное ограничение: например, исключение footer-зоны.
+    Visual constraint: for example, excluding the footer zone.
 
-    Упрощённый вариант "footer exclusion" из прототипа:
+    Simplified version of "footer exclusion" from the prototype:
         y / page_height <= max_relative_y
 
-    где y – верхняя координата выбранного узла.
+    where y is the top coordinate of the selected node.
     """
 
     def __init__(
         self,
         field_name: str,
-        max_relative_y: float = 0.75,
+        max_relative_y: float = 0.80,  # aligned with dissertation Section 6.3
         name: Optional[str] = None,
     ) -> None:
         super().__init__(name=name or f"visual[{field_name}]", field_names=[field_name])
@@ -194,7 +194,7 @@ class VisualConstraint(Constraint):
             page_height = page_context.get("page_height")
 
         if not page_height:
-            # Не знаем высоту страницы — лучше не заваливать constraint.
+            # Page height is unknown - better not to fail the constraint.
             return True
 
         for c in candidates:
@@ -219,9 +219,9 @@ def build_constraint_from_spec(
     spec: Dict[str, Any],
 ) -> Constraint:
     """
-    Построить Constraint из декларативного описания.
+    Build a Constraint from a declarative specification.
 
-    Примеры:
+    Examples:
       {"type": "unique"}
       {"type": "format", "pattern": "\\d+"}
       {"type": "visual", "max_relative_y": 0.75}
@@ -257,7 +257,7 @@ def build_constraint_from_spec(
         target_field = spec.get("field_name") or field_name
         if not target_field:
             raise ValueError("VisualConstraint requires a 'field_name'.")
-        max_rel_y = float(spec.get("max_relative_y", 0.75))
+        max_rel_y = float(spec.get("max_relative_y", 0.80))  # dissertation default
         return VisualConstraint(
             field_name=target_field,
             max_relative_y=max_rel_y,
@@ -275,20 +275,20 @@ def build_constraint_from_spec(
 @dataclass
 class Field:
     """
-    Логическое поле целевой схемы, например "title", "price".
+    Logical field of the target schema, e.g., "title", "price".
     """
 
     name: str
     dtype: str = "string"
     required: bool = True
     constraints: List[Constraint] = field(default_factory=list)
-    selector: Optional["Selector"] = None  # биндинг селектора для этого поля
+    selector: Optional["Selector"] = None  # selector binding for this field
 
 
 @dataclass
 class Schema:
     """
-    Декларативное описание схемы страницы (Section III.A).
+    Declarative description of the page schema (Section III.A).
     """
 
     name: str
@@ -300,9 +300,9 @@ class Schema:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Schema":
         """
-        Построить Schema из простого декларативного dict.
+        Build a Schema from a simple declarative dict.
 
-        Пример:
+        Example:
 
         schema_spec = {
             "name": "ProductPage",
@@ -352,7 +352,7 @@ class Schema:
                 constraints=f_constraints,
             )
 
-        # Schema-level constraints (могут ссылаться на field_name в spec)
+        # Schema-level constraints (may refer to field_name in the spec)
         for c_spec in schema_constraints_specs:
             schema_constraints.append(build_constraint_from_spec(None, c_spec))
 
@@ -366,7 +366,7 @@ class Schema:
         page_context: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """
-        Проверить все field-level и schema-level ограничения Γ на присваивании.
+        Check all field-level and schema-level constraints Γ on the assignment.
         """
         # Field-level
         for fname, field in self.fields.items():
@@ -389,8 +389,8 @@ class Schema:
 
 class Selector(ABC):
     """
-    Абстракция селектора f (Section III.B):
-    отображает страницу (граф) в множество кандидатов для одного поля.
+    Abstraction of selector f (Section III.B):
+    maps a page (graph) to a set of candidates for a single field.
     """
 
     def __init__(self, field_name: str) -> None:
@@ -399,20 +399,20 @@ class Selector(ABC):
     @abstractmethod
     def propose(self, page_graph: Any) -> List[NodeCandidate]:
         """
-        Вернуть список NodeCandidate, отсортированный по score по убыванию.
+        Return a list of NodeCandidates, sorted by score in descending order.
         """
         raise NotImplementedError
 
 
 class DefaultSelector(Selector):
     """
-    Простейший селектор по умолчанию.
+    Simplest default selector.
 
-    Ожидает, что page_graph имеет атрибут:
+    Expects page_graph to have the attribute:
         page_graph.candidates_by_field[field_name] -> List[NodeCandidate]
 
-    Вся логика получения кандидатов (GNN, эвристики и т.д.) лежит на внешнем
-    пайплайне – здесь только абстракция.
+    All candidate retrieval logic (GNN, heuristics, etc.) resides in the external
+    pipeline - this is just an abstraction.
     """
 
     def propose(self, page_graph: Any) -> List[NodeCandidate]:

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
-# В реальном пакете можно заменить на:
+# In a real package, this could be replaced with:
 # from .structure import ...
 from src.reasoning.structure import (
     Schema,
@@ -18,10 +18,10 @@ from src.reasoning.structure import (
 @dataclass
 class InferenceResult:
     """
-    Результат вывода для одной страницы.
+    Inference result for a single page.
 
-    field_results: поле -> ExtractionResult
-    stability: σ(P) – стабильность страницы.
+    field_results: mapping from field name to ExtractionResult.
+    stability: σ(P) – page stability score.
     """
 
     field_results: Dict[str, ExtractionResult]
@@ -32,19 +32,19 @@ class InferenceEngine:
     """
     Constrained Inference Engine (Section V.C).
 
-    Решает задачу:
+    Solves the optimization problem:
 
         max_S  Σ_f φ_f(S)
         s.t.   Γ(S) = True
 
-    где:
-      - S – присваивание полей кандидатов,
-      - φ_f(S) – скор модели для поля f,
-      - Γ(S) – конъюнкция ограничений схемы.
+    where:
+      - S is the assignment of candidates to fields,
+      - φ_f(S) is the model score for field f,
+      - Γ(S) is the conjunction of schema constraints.
     """
 
     def __init__(self) -> None:
-        # В будущем сюда можно пробрасывать backend ILP/SMT и т.п.
+        # Future enhancement: integrate ILP/SMT backends here, etc.
         pass
 
     # ------------------------------------------------------------------
@@ -53,23 +53,23 @@ class InferenceEngine:
 
     def solve(self, page_graph: Any, schema: Schema) -> InferenceResult:
         """
-        Запустить вывод для одной страницы.
+        Run inference for a single page.
 
         page_graph:
-          Произвольный объект, который умеют читать Selector'ы (например,
-          через page_graph.candidates_by_field или GNN-выходы).
+          An arbitrary object that Selectors can read (e.g., via
+          page_graph.candidates_by_field or GNN outputs).
 
         schema:
-          Декларативная схема (Schema) с полями и ограничениями Γ.
+          A declarative Schema containing fields and constraints Γ.
         """
-        # 1. Кандидаты для каждого поля через Selector.
+        # 1. Propose candidates for each field using its Selector.
         field_to_candidates: Dict[str, List[NodeCandidate]] = {}
         for field_name, field in schema.fields.items():
             selector = field.selector or DefaultSelector(field_name)
             candidates = selector.propose(page_graph)
             field_to_candidates[field_name] = candidates
 
-        # 2. Жадное присваивание с проверкой Γ.
+        # 2. Greedy assignment with Γ constraint checking.
         assignment: Dict[str, Optional[NodeCandidate]] = {}
         page_context = self._build_page_context(page_graph, field_to_candidates)
 
@@ -77,7 +77,7 @@ class InferenceEngine:
             candidates = field_to_candidates.get(field_name, [])
             chosen: Optional[NodeCandidate] = None
 
-            # Жадно перебираем кандидатов по убыванию score.
+            # Greedily iterate over candidates in descending order of score.
             for cand in candidates:
                 trial_assignment = dict(assignment)
                 trial_assignment[field_name] = cand
@@ -87,7 +87,7 @@ class InferenceEngine:
                     assignment[field_name] = cand
                     break
 
-            # Если ничто не удовлетворяет Γ, но поле обязательное – берём top-1.
+            # If no candidate satisfies Γ, but the field is required – pick the top-1.
             if chosen is None and candidates:
                 if field.required:
                     chosen = candidates[0]
@@ -95,7 +95,7 @@ class InferenceEngine:
                 else:
                     assignment[field_name] = None
 
-        # 3. Формируем ExtractionResult с proof / justification.
+        # 3. Formulate the ExtractionResult with proof / justification.
         field_results: Dict[str, ExtractionResult] = {}
         for field_name, field in schema.fields.items():
             cand = assignment.get(field_name)
@@ -126,7 +126,7 @@ class InferenceEngine:
                 },
             )
 
-        # 4. σ(P): минимальный margin по полям.
+        # 4. Compute σ(P): the stability score across fields.
         stability = self.compute_stability_score(field_to_candidates)
 
         return InferenceResult(field_results=field_results, stability=stability)
@@ -140,29 +140,35 @@ class InferenceEngine:
         field_to_candidates: Dict[str, List[NodeCandidate]],
     ) -> float:
         """
-        σ(P) = min_f σ_f, где σ_f = score_best(f) - score_second(f).
+        σ(P) = E_{n∈P} [ P(ŷ₁|n) − P(ŷ₂|n) ]
 
-        Если кандидатов меньше двух, второй скор считаем 0.
+        Per the dissertation (Section 6.4 / Appendix A.3), stability is the
+        *mean* margin across all candidate nodes on the page, not the minimum.
+        Using minimum would make σ overly sensitive to a single low-confidence
+        node and would not correlate well with overall extraction correctness.
+
+        Implementation: for each field, collect per-candidate margins; then
+        average over all candidates across all fields.
         """
-        margins: List[float] = []
+        all_margins: List[float] = []
 
-        for field_name, candidates in field_to_candidates.items():
-            if not candidates:
-                margins.append(0.0)
-                continue
+        for candidates in field_to_candidates.values():
+            for i, cand in enumerate(candidates):
+                best = float(getattr(cand, "score", 0.0))
+                # Find second-best score among other candidates for the same field
+                second = 0.0
+                for j, other in enumerate(candidates):
+                    if j != i:
+                        s = float(getattr(other, "score", 0.0))
+                        if s > second:
+                            second = s
+                margin = max(0.0, best - second)
+                all_margins.append(margin)
 
-            best = float(getattr(candidates[0], "score", 0.0))
-            second = (
-                float(getattr(candidates[1], "score", 0.0))
-                if len(candidates) > 1
-                else 0.0
-            )
-            margins.append(max(0.0, best - second))
-
-        if not margins:
+        if not all_margins:
             return 0.0
 
-        return min(margins)
+        return float(sum(all_margins) / len(all_margins))  # mean, not min
 
     # ------------------------------------------------------------------
     # Helpers
@@ -174,8 +180,8 @@ class InferenceEngine:
         field_to_candidates: Dict[str, List[NodeCandidate]],
     ) -> Dict[str, Any]:
         """
-        Строим лёгкий контекст страницы (сейчас только page_height),
-        нужный для VisualConstraint.
+        Builds a lightweight page context (currently only page_height),
+        which is required for VisualConstraints.
         """
         page_height = getattr(page_graph, "page_height", None)
 
@@ -200,19 +206,19 @@ class InferenceEngine:
         page_context: Dict[str, Any],
     ) -> Tuple[List[str], List[str]]:
         """
-        Для заданного поля считаем, какие ограничения Γ удовлетворены / нарушены
-        при финальном присваивании – для заполнения proof.
+        Evaluates which constraints Γ are satisfied or violated for a given field
+        under the final assignment, in order to populate the proof.
         """
         satisfied: List[str] = []
         violated: List[str] = []
 
-        # Field-level
+        # Field-level constraints
         field: Field = schema.fields[field_name]
         for c in field.constraints:
             ok = c.check(assignment, page_context)
             (satisfied if ok else violated).append(c.name)
 
-        # Schema-level, которые применимы к этому полю.
+        # Schema-level constraints that apply to this specific field
         for c in schema.constraints:
             if not c.applies_to(field_name):
                 continue

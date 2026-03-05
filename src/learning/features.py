@@ -1,86 +1,85 @@
-from typing import Optional
+"""
+Feature encoding for SmartScrape nodes.
+
+Uses a lightweight hash-based text encoder instead of BERT to avoid
+heavy dependencies (sentencepiece, transformers download).
+When the GNN is trained, this encoder produces consistent fixed-size
+vectors from text, geometry, and HTML tag features.
+"""
+
+import re
+import math
 import torch
-from transformers import AutoTokenizer, AutoModel
+from typing import Optional
 
 
 class FeatureEncoder:
     """
-    Отвечает за превращение сырых данных (текст, координаты, теги)
-    в векторные представления (Embeddings).
+    Lightweight feature encoder — no transformers/sentencepiece required.
+
+    Text is encoded via character n-gram hashing into a fixed-size vector.
+    This is deterministic, fast, and produces the same dimensionality as
+    bert-tiny (128) so the GNN architecture is unchanged.
     """
 
-    def __init__(
-        self,
-        model_name: str = "prajjwal1/bert-tiny",
-        device: Optional[str] = None,
-    ):
-        print(f"[FeatureEncoder] Loading BERT model: {model_name}...")
+    TEXT_DIM = 128   # matches bert-tiny hidden size
+    VISUAL_DIM = 4   # x, y, w, h (normalized)
 
-        self.device = torch.device(
-            device or ("cuda" if torch.cuda.is_available() else "cpu")
-        )
+    TAG_MAP = {
+        "div": 0, "span": 1, "a": 2, "img": 3, "p": 4,
+        "h1": 5, "h2": 6, "li": 7, "ul": 8, "table": 9,
+        "form": 10, "input": 11, "button": 12,
+    }
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.bert = AutoModel.from_pretrained(model_name).to(self.device)
-        self.bert.eval()  # выключаем dropout
+    def __init__(self, model_name: Optional[str] = None, device: Optional[str] = None):
+        # model_name kept for API compatibility but ignored
+        self.text_dim = self.TEXT_DIM
+        self.visual_dim = self.VISUAL_DIM
+        self.tag_dim = len(self.TAG_MAP) + 1  # +1 for 'other'
+        print("[FeatureEncoder] Using lightweight hash encoder (no BERT needed).")
 
-        # Размерность текста берём из конфига модели
-        self.text_dim = self.bert.config.hidden_size  # для bert-tiny = 128
-
-        # x, y, w, h
-        self.visual_dim = 4
-
-        self.tag_map = {
-            "div": 0,
-            "span": 1,
-            "a": 2,
-            "img": 3,
-            "p": 4,
-            "h1": 5,
-            "h2": 6,
-            "li": 7,
-            "ul": 8,
-            "table": 9,
-            "form": 10,
-            "input": 11,
-            "button": 12,
-        }
-        self.tag_dim = len(self.tag_map) + 1  # +1 для 'other'
+    # ------------------------------------------------------------------
 
     def encode_text(self, text: str) -> torch.Tensor:
-        """Превращает текст в вектор (BERT embedding)."""
-        if not text or str(text).strip() == "":
-            return torch.zeros(self.text_dim, dtype=torch.float32)
+        """
+        Encode text into a 128-dim vector using character n-gram hashing.
+        Deterministic, no external models needed.
+        """
+        vec = [0.0] * self.TEXT_DIM
+        text = str(text).lower().strip()
 
-        inputs = self.tokenizer(
-            str(text)[:64],
-            return_tensors="pt",
-            padding="max_length",
-            max_length=10,
-            truncation=True,
-        )
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        if not text:
+            return torch.zeros(self.TEXT_DIM, dtype=torch.float32)
 
-        with torch.no_grad():
-            outputs = self.bert(**inputs)
-            # [batch, seq_len, hidden] -> [hidden]
-            emb = outputs.last_hidden_state[0, 0]
+        # Character 2-grams and 3-grams → hash into vector buckets
+        for n in (2, 3):
+            for i in range(len(text) - n + 1):
+                gram = text[i: i + n]
+                # Simple polynomial hash
+                h = 0
+                for ch in gram:
+                    h = (h * 31 + ord(ch)) & 0xFFFFFF
+                idx = h % self.TEXT_DIM
+                vec[idx] += 1.0
 
-        return emb.cpu()  # чтобы потом всё было на CPU
+        # L2-normalize
+        norm = math.sqrt(sum(v * v for v in vec)) or 1.0
+        vec = [v / norm for v in vec]
+
+        return torch.tensor(vec, dtype=torch.float32)
 
     def encode_visual(self, x, y, w, h, page_w, page_h) -> torch.Tensor:
-        """Нормализует координаты относительно размера страницы (0..1)."""
-        page_w = page_w if page_w > 0 else 1920.0
-        page_h = page_h if page_h > 0 else 1080.0
-
+        """Normalize bounding box coordinates to [0, 1]."""
+        page_w = float(page_w) if page_w and page_w > 0 else 1920.0
+        page_h = float(page_h) if page_h and page_h > 0 else 1080.0
         return torch.tensor(
             [x / page_w, y / page_h, w / page_w, h / page_h],
             dtype=torch.float32,
         )
 
     def encode_tag(self, tag_name: str) -> torch.Tensor:
-        """One-Hot кодирование HTML тега."""
-        idx = self.tag_map.get(tag_name.lower(), len(self.tag_map))
+        """One-hot encode HTML tag."""
+        idx = self.TAG_MAP.get(str(tag_name).lower(), len(self.TAG_MAP))
         vec = torch.zeros(self.tag_dim, dtype=torch.float32)
         vec[idx] = 1.0
         return vec

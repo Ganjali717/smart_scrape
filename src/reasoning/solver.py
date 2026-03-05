@@ -2,11 +2,17 @@ from ortools.linear_solver import pywraplp
 import numpy as np
 from typing import List, Dict, Any
 
+from config import FOOTER_THRESHOLD
+
 
 class ConstraintSolver:
     """
     Implements the constraint-guided inference (Eq. 1 in the paper).
     Ensures that the extracted data satisfies Schema Constraints (Gamma).
+
+    ILP formulation (Appendix A.2 of the dissertation):
+        max  Σ_{i,f}  s(i, f) * x_{i,f}
+        s.t. Γ(x) = True
     """
 
     def __init__(self, classes: List[str]):
@@ -20,20 +26,19 @@ class ConstraintSolver:
         Solves the Integer Linear Programming (ILP) problem.
         Maximize: Sum(Confidence)
         Subject to:
-          1. Uniqueness Constraints (One price per page)
-          2. Geometric Constraints (Price cannot be in footer)
+          Γ1 — Uniqueness:  at most one Price and one Title per page
+          Γ2 — Geometry:    Title/Price cannot appear in the footer zone
+          Γ3 — Integrity:   each node is assigned exactly one class
         """
         num_nodes = len(raw_nodes)
         num_classes = len(self.classes)
 
-        # Создаем SCIP солвер (стандарт для OR-Tools)
         solver = pywraplp.Solver.CreateSolver("SCIP")
         if not solver:
             print("[Solver] SCIP solver not available, falling back to greedy.")
             return self._greedy_fallback(raw_nodes, probs)
 
-        # --- 1. Variables ---
-        # x[i, j] = 1, если узел i назначен классу j
+        # --- 1. Binary decision variables: x[i, j] ∈ {0, 1} ---
         x = {}
         for i in range(num_nodes):
             for j in range(num_classes):
@@ -41,21 +46,20 @@ class ConstraintSolver:
 
         # --- 2. Constraints (Gamma) ---
 
-        # A. Integrity: Каждый узел имеет ровно 1 класс (включая 'other')
+        # Γ3 — Integrity: each node gets exactly one label (including 'other')
         for i in range(num_nodes):
             solver.Add(solver.Sum([x[i, j] for j in range(num_classes)]) == 1)
 
-        # B. Schema Cardinality: Не больше одной Price и одного Title на странице
-        # Это реализует "UNIQUENESS" из вашего app.py
+        # Γ1 — Uniqueness: at most one Price and one Title per page (Section 6.7.1)
         for target_name in ["title", "price"]:
             if target_name in self.cls_to_idx:
                 t_idx = self.cls_to_idx[target_name]
                 solver.Add(solver.Sum([x[i, t_idx] for i in range(num_nodes)]) <= 1)
 
-        # C. GEOMETRIC CONSTRAINTS (Theorem 1 / Heuristics)
-        # "Footer Trap": Запрещаем выбирать Title или Price в нижней 25% части страницы.
-        # Это решает проблему с блоком рекомендаций и ссылками внизу.
-        limit_y = page_height * 0.75
+        # Γ2 — Geometry / Footer Trap (Section 6.3):
+        # Nodes in the bottom (1 - FOOTER_THRESHOLD) of the page cannot be
+        # Title or Price. Threshold = 0.80 → bottom 20% is footer zone.
+        limit_y = page_height * FOOTER_THRESHOLD
 
         price_idx = self.cls_to_idx.get("price")
         title_idx = self.cls_to_idx.get("title")

@@ -7,7 +7,7 @@ from .features import FeatureEncoder
 
 class FitLayoutParser:
     """
-    Парсит JSON-LD от FitLayout и строит граф для GNN.
+    Parses JSON-LD from FitLayout and builds a graph for GNN.
     """
 
     def __init__(self):
@@ -15,11 +15,11 @@ class FitLayoutParser:
 
     def parse(self, json_data: dict):
         """
-        Главный метод: JSON -> PyTorch Geometric Data
+        Main method: JSON -> PyTorch Geometric Data
         """
         graphs = json_data.get("@graph", [])
 
-        # Плоский список всех элементов (верхний уровень + вложенные @graph)
+        # Flat list of all elements (top level + nested @graphs)
         flat_items = []
         for g in graphs:
             if isinstance(g, dict) and "@graph" in g:
@@ -32,21 +32,21 @@ class FitLayoutParser:
             else:
                 flat_items.append(g)
 
-        # Индекс всех объектов по @id: нужен, чтобы раскрывать b:bounds -> rect-объект
+        # Index of all objects by @id: needed to resolve b:bounds -> rect object
         id_index = {
             item["@id"]: item
             for item in flat_items
             if isinstance(item, dict) and "@id" in item
         }
 
-        # Размеры страницы (b:width/b:height у объекта Page)
+        # Page dimensions (b:width/b:height of the Page object)
         page_w, page_h = self._get_page_size(flat_items)
 
         nodes = []
         raw_nodes = []
         extracted_items = []
 
-        # Проходим по всем элементам (учитываем вариант с вложенными @graph)
+        # Iterate through all elements (handling the nested @graph variant)
         for g in graphs:
             inner_items = (
                 g.get("@graph", []) if isinstance(g, dict) and "@graph" in g else [g]
@@ -67,15 +67,15 @@ class FitLayoutParser:
                 extracted_items.append((item, x, y, w, h))
 
         print(
-            f"[GraphBuilder] Найдено {len(extracted_items)} элементов с координатами."
+            f"[GraphBuilder] Found {len(extracted_items)} elements with coordinates."
         )
 
-        # 3. Создаём фичи для каждого элемента
+        # 3. Create features for each element
         for item, x, y, w, h in extracted_items:
-            # текст
+            # text
             text = self._find_key_ending_with(item, "text") or ""
 
-            # html-тег (в артефакте это b:htmlTagName)
+            # html tag (in the artifact this is b:htmlTagName)
             tag = (
                 self._find_key_ending_with(item, "htmlTagName")
                 or self._find_key_ending_with(item, "htmlTag")
@@ -100,7 +100,7 @@ class FitLayoutParser:
             )
 
         if not nodes:
-            print("[Error] Не удалось построить узлы. Проверьте формат JSON.")
+            print("[Error] Failed to build nodes. Check the JSON format.")
             return None, None
 
         x_tensor = torch.stack(nodes)
@@ -112,26 +112,26 @@ class FitLayoutParser:
 
     # --------- helpers ---------
 
-    def _find_key_ending_with(self, d: dict, suffix: str):
-        """Поиск значения по суффиксу ключа (b:text, b:htmlTagName, b:bounds и т.д.)."""
+    def _find_key_ending_with(self, d: dict, suffix: str) -> str | None:
+        """Finds a value by key suffix (b:text, b:htmlTagName, b:bounds, etc.)."""
         for k, v in d.items():
             if k.endswith(suffix):
-                # Значения FitLayout часто приходят в обёртке {"@value": "..."} — разворачиваем её
+                # FitLayout values often come wrapped in {"@value": "..."} — unwrap it
                 if isinstance(v, dict) and "@value" in v:
-                    return v["@value"]
-                return v
+                    return str(v["@value"])
+                return str(v)
         return None
 
     def _resolve_bbox(self, bounds_ref, id_index):
         """
-        Приводит значение b:bounds к (x, y, w, h).
-        Возможные варианты:
-        - строка "x,y,w,h" или "x y w h"
-        - строка-IRI "r:art66#b0-rect-b"
-        - словарь {"@id": "..."} на rect-объект
-        - сразу rect-объект с b:positionX / b:positionY / b:width / b:height
+        Resolves the b:bounds value to (x, y, w, h).
+        Possible variants:
+        - string "x,y,w,h" or "x y w h"
+        - IRI string "r:art66#b0-rect-b"
+        - dictionary {"@id": "..."} pointing to a rect object
+        - direct rect object with b:positionX / b:positionY / b:width / b:height
         """
-        # вариант 1: строка
+        # variant 1: string
         if isinstance(bounds_ref, str):
             coords = self._parse_coords_string(bounds_ref)
             if coords:
@@ -142,7 +142,7 @@ class FitLayoutParser:
                 return self._bbox_from_rect(rect)
             return None
 
-        # вариант 2: dict
+        # variant 2: dict
         if isinstance(bounds_ref, dict):
             if "@id" in bounds_ref:
                 rect = id_index.get(bounds_ref["@id"], bounds_ref)
@@ -157,12 +157,12 @@ class FitLayoutParser:
         y = self._get_numeric(rect, "positionY")
         w = self._get_numeric(rect, "width")
         h = self._get_numeric(rect, "height")
-        if None in (x, y, w, h):
+        if x is None or y is None or w is None or h is None:
             return None
         return float(x), float(y), float(w), float(h)
 
     def _parse_coords_string(self, s: str):
-        """Парсинг строк 'x,y,w,h' или 'x y w h'."""
+        """Parses strings like 'x,y,w,h' or 'x y w h'."""
         parts = re.split(r"[,\s]+", s.strip())
         if len(parts) != 4:
             return None
@@ -172,7 +172,7 @@ class FitLayoutParser:
             return None
 
     def _get_numeric(self, obj: dict, suffix: str):
-        """Берёт число из поля вида b:width / b:height / b:positionX и т.п."""
+        """Extracts a number from fields like b:width / b:height / b:positionX, etc."""
         for k, v in obj.items():
             if k.endswith(suffix):
                 if isinstance(v, dict):
@@ -184,7 +184,7 @@ class FitLayoutParser:
         return None
 
     def _get_page_size(self, graphs):
-        """Ищет объект Page и берёт b:width/b:height; иначе дефолт 1920x1080."""
+        """Finds the Page object and gets b:width/b:height; otherwise defaults to 1920x1080."""
         page_w = page_h = None
         for item in graphs:
             if not isinstance(item, dict):
@@ -207,7 +207,7 @@ class FitLayoutParser:
         return page_w, page_h
 
     def _build_knn_edges(self, nodes_info, k=3):
-        """Строит связи между визуально близкими элементами."""
+        """Builds edges between visually close elements."""
         edges = []
         num_nodes = len(nodes_info)
         if num_nodes < 2:
@@ -226,7 +226,7 @@ class FitLayoutParser:
 
             dists.sort(key=lambda x: x[0])
             for _, neighbor_idx in dists[:k]:
-                # Делаем граф неориентированным: добавляем рёбра в обе стороны
+                # Make the graph undirected: add edges in both directions
                 edges.append([i, neighbor_idx])
                 edges.append([neighbor_idx, i])
 
@@ -235,9 +235,9 @@ class FitLayoutParser:
 
     def _build_hybrid_edges(self, nodes_info, k=3):
         """
-        Строит граф, объединяя:
-        1. KNN (визуальная близость)
-        2. Containment (вложенность/иерархия) - ключевое для статьи
+        Builds a graph combining:
+        1. KNN (visual proximity)
+        2. Containment (nesting/hierarchy) - key for the paper
         """
         edges = []
         num_nodes = len(nodes_info)
@@ -247,13 +247,13 @@ class FitLayoutParser:
         for i in range(num_nodes):
             xi, yi, wi, hi = nodes_info[i]["bbox"]
 
-            # --- 1. KNN Edges (Локальный контекст) ---
+            # --- 1. KNN Edges (Local context) ---
             dists = []
             for j in range(num_nodes):
                 if i == j:
                     continue
                 xj, yj, _, _ = nodes_info[j]["bbox"]
-                # Евклидово расстояние
+                # Euclidean distance
                 dist = ((xi - xj) ** 2 + (yi - yj) ** 2) ** 0.5
                 dists.append((dist, j))
 
@@ -261,15 +261,15 @@ class FitLayoutParser:
             for _, neighbor_idx in dists[:k]:
                 edges.append([i, neighbor_idx])
 
-            # --- 2. Containment Edges (Иерархический контекст) ---
-            # Это реализует логику "Visual grouping" из FitLayout [cite: 96]
+            # --- 2. Containment Edges (Hierarchical context) ---
+            # This implements the "Visual grouping" logic from FitLayout
             for j in range(num_nodes):
                 if i == j:
                     continue
                 xj, yj, wj, hj = nodes_info[j]["bbox"]
 
-                # Проверяем, находится ли узел J внутри узла I (Parent -> Child)
-                # Добавляем небольшой допуск (epsilon) для нечетких границ
+                # Check if node J is inside node I (Parent -> Child)
+                # Add a small tolerance (epsilon) for fuzzy boundaries
                 if (
                     (xi <= xj)
                     and (yi <= yj)
@@ -279,9 +279,9 @@ class FitLayoutParser:
                     edges.append([i, j])  # Parent -> Child
                     edges.append(
                         [j, i]
-                    )  # Child -> Parent (для прохода сообщения обратно)
+                    )  # Child -> Parent (for backward message passing)
 
-        # Удаляем дубликаты ребер
+        # Remove duplicate edges
         edges = list(set(tuple(e) for e in edges))
 
         edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
