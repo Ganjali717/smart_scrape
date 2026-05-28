@@ -36,6 +36,9 @@ HIDDEN_DIM = 64
 # Paper reference: Section 6.3, Constraint 2 (Geometry / Footer Trap).
 FOOTER_THRESHOLD = 0.80
 
+# Product-zone exclusion threshold for books.toscrape.com sample pages (paper Γ3).
+PRODUCT_ZONE_MAX_PX = float(os.getenv("SMARTSCRAPE_PRODUCT_ZONE_MAX_PX", "500.0"))
+
 # Stability score threshold for drift detection (Section 6.4)
 STABILITY_THRESHOLD = 0.60
 

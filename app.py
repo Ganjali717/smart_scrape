@@ -215,8 +215,9 @@ if mode == "🔴 Live Extraction":
             st.code(f"""\
 1. UNIQUENESS:   ∑ x[i, Price] ≤ 1,   ∑ x[i, Title] ≤ 1
 2. GEOMETRY:     ∀n: y(n) > {FOOTER_THRESHOLD} × PageHeight  ⇒  x[n, Title] = 0  ∧  x[n, Price] = 0
-3. FORMAT:       x[n, Price] = 1  ⇒  HasCurrency(n) ∧ IsNumeric(n)
-4. INTEGRITY:    ∑_j x[i, j] = 1   ∀i  (each node has exactly one label)
+3. PRODUCT ZONE: y(n) > 500 px ⇒ x[n, Title] = 0 ∧ x[n, Price] = 0
+4. FORMAT:       x[n, Price] = 1  ⇒  HasCurrency(n) ∧ IsNumeric(n)
+5. INTEGRITY:    ∑_j x[i, j] = 1   ∀i  (each node has exactly one label)
 Reasoning mode: {reasoning_mode.upper()}""", language="prolog")
 
         with st.expander("2. Drift Detection & Stability σ(P)", expanded=True):
@@ -305,8 +306,8 @@ elif mode == "📊 Batch Evaluation":
 
         n = len(test_subset)
         c1, c2, c3, c4, c5 = st.columns(5)
-        c1.metric("Title F1",      f"{correct_titles/n*100:.0f}%")
-        c2.metric("Price F1",      f"{correct_prices/n*100:.0f}%")
+        c1.metric("Title Acc.",    f"{correct_titles/n*100:.0f}%")
+        c2.metric("Price Acc.",    f"{correct_prices/n*100:.0f}%")
         c3.metric("Both Correct",  f"{correct_both/n*100:.0f}%")
         c4.metric("Constraint Violations", str(constraint_violations))
         c5.metric("Pages Evaluated", str(n))

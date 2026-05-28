@@ -11,7 +11,7 @@ from torch_geometric.nn import GCNConv
 from sklearn.model_selection import train_test_split
 
 # ── Config ──────────────────────────────────────────────────
-DATA_FILE  = "data/labeled.json"   # путь к датасету
+DATA_FILE  = "data/labeled_2.json"   # путь к датасету
 OUTPUT     = "model.pt"             # куда сохранить
 EPOCHS     = 100
 LR         = 0.001
@@ -56,8 +56,10 @@ LABEL_MAP = {"price": 0, "title": 1, "other": 2}
 def page_to_graph(nodes):
     feats, labels = [], []
     for node in nodes:
+        # Feature order must match runtime graph_builder.py and paper Section 3:
+        # text(128) + visual(4) + tag(15).
         f = torch.cat([
-            encode_text(node['text']),
+            encode_text(node.get('text', '')),
             encode_visual(node.get('bbox', [])),
             encode_tag(node.get('tag', 'div')),
         ])

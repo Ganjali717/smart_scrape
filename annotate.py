@@ -14,7 +14,7 @@ st.set_page_config(page_title="SmartScrape Annotator", page_icon="🏷️", layo
 
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(exist_ok=True)
-LABELS_FILE = DATA_DIR / "labeled.json"
+LABELS_FILE = DATA_DIR / "labeled_2.json"
 
 LABEL_OPTIONS = ["other", "title", "price"]
 LABEL_COLORS  = {"title": "#1565C0", "price": "#2E7D32", "other": "#555"}

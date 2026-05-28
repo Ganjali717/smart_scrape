@@ -60,10 +60,12 @@ def build_graph_from_nodes(
         label_str = node.get("label", "other")
 
         x, y, w, h = float(bbox[0]), float(bbox[1]), float(bbox[2]), float(bbox[3])
-        v_feat = encoder.encode_visual(x, y, w, h, page_w, page_h)
+        # Feature order must match runtime graph_builder.py and paper Section 3:
+        # text(128) + visual(4) + tag(15).
         t_feat = encoder.encode_text(text)
+        v_feat = encoder.encode_visual(x, y, w, h, page_w, page_h)
         s_feat = encoder.encode_tag(tag)
-        full_vec = torch.cat([v_feat, t_feat, s_feat])
+        full_vec = torch.cat([t_feat, v_feat, s_feat])
         node_features.append(full_vec)
         labels.append(LABEL_MAP.get(label_str, 2))
 
@@ -176,14 +178,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data",
         type=str,
-        default="data/books_labeled.json",
+        default="data/labeled_2.json",
         help="Path to labeled training data (JSON)",
     )
     parser.add_argument(
         "--epochs",
         type=int,
-        default=50,
-        help="Number of training epochs (default: 50)",
+        default=100,
+        help="Number of training epochs (default: 100)",
     )
     parser.add_argument(
         "--output",

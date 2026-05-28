@@ -15540,5 +15540,60 @@
         }
       }
     }
+  },
+  {
+    "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+    "stability_score": 0.588342851812118,
+    "reason": "DRIFT_DETECTED: \u03c3 below threshold (cf. Theorem 1).",
+    "drift_context": {
+      "page_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "stability": 0.588342851812118,
+      "stability_threshold": 0.6,
+      "history_size": 347,
+      "history_mean": 3.2394384746861693,
+      "drift_detected": true,
+      "timestamp": "2026-05-28T12:03:27.274482Z"
+    },
+    "timestamp_utc": "2026-05-28T12:03:27.274482Z",
+    "prediction_summary": {
+      "title": {
+        "text": "Tipping the Velvet Home",
+        "bbox": [
+          615.0,
+          218.0,
+          238.0,
+          33.0
+        ],
+        "confidence": 30.105697631835938,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      },
+      "price": {
+        "text": "\u00a353.74",
+        "bbox": [
+          615.0,
+          277.0,
+          80.0,
+          30.0
+        ],
+        "confidence": 40.88359069824219,
+        "proof": {
+          "reasoning": "ILP",
+          "constraints": [
+            "uniqueness",
+            "geometry[footer]",
+            "format"
+          ],
+          "violated": []
+        }
+      }
+    }
   }
 ]

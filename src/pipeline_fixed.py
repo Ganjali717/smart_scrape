@@ -24,7 +24,7 @@ from src.learning.graph_builder import FitLayoutParser
 from src.learning.gnn_model import SmartScrapeGNN
 from src.learning.drift_monitor import DriftMonitor, ActiveLearningManager
 from src.reasoning.solver_fixed import ConstraintSolver
-from config import FOOTER_THRESHOLD, STABILITY_THRESHOLD, MODEL_CHECKPOINT
+from config import FOOTER_THRESHOLD, STABILITY_THRESHOLD, MODEL_CHECKPOINT, PRODUCT_ZONE_MAX_PX
 
 
 ReasoningMode = Literal["ilp", "greedy"]
@@ -164,8 +164,9 @@ class SmartScrapePipeline:
             "active_constraints": [
                 "uniqueness[title]",
                 "uniqueness[price]",
-                f"geometry[footer > {FOOTER_THRESHOLD}]",
-                "format[price ~ currency_pattern]",
+                f"Γ2 footer_trap[y > {FOOTER_THRESHOLD} × page_height]",
+                f"Γ3 product_zone[y > {PRODUCT_ZONE_MAX_PX}px]",
+                "Γ4 format[price => HasCurrency ∧ IsNumeric]",
             ],
         }
 
@@ -305,33 +306,39 @@ class SmartScrapePipeline:
     def _format_ilp_result(
         self, solver_result: Dict, raw_nodes: List[Dict]
     ) -> Dict[str, Any]:
-        """Convert ConstraintSolver output to standard record format."""
-        record = {}
-        node_index = {str(n.get("id", i)): n for i, n in enumerate(raw_nodes)}
+        """Convert ConstraintSolver output to standard proof/provenance record."""
+        record: Dict[str, Any] = {}
+        solver_meta = solver_result.get("_solver", {}) if isinstance(solver_result, dict) else {}
 
         for field_name, field_data in solver_result.items():
-            if not isinstance(field_data, dict):
+            if field_name.startswith("_") or not isinstance(field_data, dict):
                 continue
             record[field_name] = {
                 "text": field_data.get("text", ""),
                 "bbox": field_data.get("bbox", [0, 0, 0, 0]),
                 "confidence": float(field_data.get("confidence", 0.0)),
+                "node_id": field_data.get("node_id"),
+                "solver_variable": field_data.get("solver_variable"),
                 "proof": {
                     "reasoning": "ILP",
-                    "constraints": ["uniqueness", "geometry[footer]", "format"],
-                    "violated": [],
+                    "solver_backend": solver_meta.get("backend", "OR-Tools SCIP"),
+                    "solver_status": solver_meta.get("status", "UNKNOWN"),
+                    "objective_value": solver_meta.get("objective_value"),
+                    "constraints": solver_meta.get("constraints", []),
+                    "violated": solver_meta.get("violated", []),
+                    "fallback_used": bool(solver_meta.get("fallback_used", False)),
                 },
             }
 
-        # Merge split titles: FitLayout sometimes splits long titles into 2 nodes
+        # Merge split titles: FitLayout sometimes splits long titles into 2 nodes.
         if "title" in record:
-            title_y = record["title"]["bbox"][1] if record["title"]["bbox"] else 0
+            title_y = record["title"]["bbox"][1] if record["title"].get("bbox") else 0
             title_text = record["title"]["text"]
             price_text = record.get("price", {}).get("text", "")
 
             for node in raw_nodes:
-                ny    = node["bbox"][1] if node.get("bbox") else 0
-                text  = node.get("text", "").strip()
+                ny = node["bbox"][1] if node.get("bbox") else 0
+                text = node.get("text", "").strip()
                 if (
                     abs(ny - title_y) <= 60
                     and text != title_text
@@ -341,6 +348,9 @@ class SmartScrapePipeline:
                 ):
                     record["title"]["text"] = title_text + " " + text
                     break
+
+        if solver_meta:
+            record["_solver"] = solver_meta
 
         return record
 

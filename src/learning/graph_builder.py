@@ -76,12 +76,6 @@ class FitLayoutParser:
             f"[GraphBuilder] Found {len(extracted_items)} elements with coordinates."
         )
 
-        # DEBUG — покажи первые 3 ноды полностью
-        for idx, (item, x, y, w, h) in enumerate(extracted_items[:3]):
-            print(f"[DEBUG NODE {idx}] bbox=({x},{y},{w},{h}) keys={list(item.keys())}")
-            for k, v in item.items():
-                print(f"  {k}: {str(v)[:80]}")
-
         # 3. Create features for each element
         for item, x, y, w, h in extracted_items:
             # text
@@ -95,11 +89,14 @@ class FitLayoutParser:
             )
 
             # --- Encoding ---
-            v_feat = self.encoder.encode_visual(x, y, w, h, page_w, page_h)
+            # Feature order MUST match the paper and training code:
+            # 128-dim text hash + 4-dim visual bbox + 15-dim tag one-hot = 147 dims.
+            # Do not change this order without retraining model.pt.
             t_feat = self.encoder.encode_text(text)
+            v_feat = self.encoder.encode_visual(x, y, w, h, page_w, page_h)
             s_feat = self.encoder.encode_tag(tag)
 
-            full_vector = torch.cat([v_feat, t_feat, s_feat])
+            full_vector = torch.cat([t_feat, v_feat, s_feat])
             nodes.append(full_vector)
 
             raw_nodes.append(
