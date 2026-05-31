@@ -20,7 +20,7 @@ from typing import Dict, List
 import numpy as np
 import torch
 
-from train import build_graph_from_nodes, LABEL_MAP
+from src.learning import encoding
 from src.learning.features import FeatureEncoder
 from src.learning.gnn_model import SmartScrapeGNN
 from src.reasoning.solver_fixed import ConstraintSolver
@@ -88,7 +88,7 @@ def main():
         if not title_node or not price_node:
             continue
 
-        graph, _ = build_graph_from_nodes(nodes, encoder)
+        graph, _ = encoding.page_to_graph(nodes)
         with torch.no_grad():
             scores = torch.exp(model(graph)).numpy()
 

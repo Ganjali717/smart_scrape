@@ -3,6 +3,7 @@ import torch
 import networkx as nx
 from torch_geometric.data import Data
 from .features import FeatureEncoder
+from . import encoding
 
 
 class FitLayoutParser:
@@ -113,7 +114,7 @@ class FitLayoutParser:
             return None, None
 
         x_tensor = torch.stack(nodes)
-        edge_index = self._build_hybrid_edges(raw_nodes, k=3)
+        edge_index = encoding.build_edges(raw_nodes, k=3)
         data = Data(x=x_tensor, edge_index=edge_index)
 
         return data, raw_nodes
@@ -214,70 +215,3 @@ class FitLayoutParser:
             page_h = 1080.0
         return page_w, page_h
 
-    def _build_knn_edges(self, nodes_info, k=3):
-        """Builds edges between visually close elements."""
-        edges = []
-        num_nodes = len(nodes_info)
-        if num_nodes < 2:
-            return torch.tensor([[0], [0]], dtype=torch.long)
-
-        for i in range(num_nodes):
-            dists = []
-            xi, yi, _, _ = nodes_info[i]["bbox"]
-            for j in range(num_nodes):
-                if i == j:
-                    continue
-                xj, yj, _, _ = nodes_info[j]["bbox"]
-                dist = ((xi - xj) ** 2 + (yi - yj) ** 2) ** 0.5
-                dists.append((dist, j))
-            dists.sort(key=lambda x: x[0])
-            for _, neighbor_idx in dists[:k]:
-                edges.append([i, neighbor_idx])
-                edges.append([neighbor_idx, i])
-
-        edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
-        return edge_index
-
-    def _build_hybrid_edges(self, nodes_info, k=3):
-        """
-        Builds a graph combining:
-        1. KNN (visual proximity)
-        2. Containment (nesting/hierarchy)
-        """
-        edges = []
-        num_nodes = len(nodes_info)
-        if num_nodes < 2:
-            return torch.tensor([[0], [0]], dtype=torch.long)
-
-        for i in range(num_nodes):
-            xi, yi, wi, hi = nodes_info[i]["bbox"]
-
-            # --- 1. KNN Edges ---
-            dists = []
-            for j in range(num_nodes):
-                if i == j:
-                    continue
-                xj, yj, _, _ = nodes_info[j]["bbox"]
-                dist = ((xi - xj) ** 2 + (yi - yj) ** 2) ** 0.5
-                dists.append((dist, j))
-            dists.sort(key=lambda x: x[0])
-            for _, neighbor_idx in dists[:k]:
-                edges.append([i, neighbor_idx])
-
-            # --- 2. Containment Edges ---
-            for j in range(num_nodes):
-                if i == j:
-                    continue
-                xj, yj, wj, hj = nodes_info[j]["bbox"]
-                if (
-                    (xi <= xj)
-                    and (yi <= yj)
-                    and (xi + wi >= xj + wj)
-                    and (yi + hi >= yj + hj)
-                ):
-                    edges.append([i, j])
-                    edges.append([j, i])
-
-        edges = list(set(tuple(e) for e in edges))
-        edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
-        return edge_index

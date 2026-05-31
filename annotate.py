@@ -276,7 +276,7 @@ with col_info:
             )
 
 with st.expander("📤 Export & Train"):
-    st.code(f"python train.py --data {LABELS_FILE} --epochs 50 --output model.pt")
+    st.code(f"python train_gnn.py --data {LABELS_FILE} --epochs 50 --output model.pt")
     if pages:
         st.download_button(
             "⬇️ Download labeled.json",

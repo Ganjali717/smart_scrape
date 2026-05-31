@@ -4,7 +4,7 @@
 Drift monitoring and active learning utilities for SmartScrape.
 
 This module operationalizes the stability notion σ_f(P) discussed around
-Theorem 1 and Eq. (1) in the paper:
+Stability metric σ(P), Eq. (2) in the paper:
 
 - Stability σ is estimated via margin sampling:
   σ = E_i[ p̂_top1(i) - p̂_top2(i) ],
@@ -80,7 +80,8 @@ class DriftMonitor:
     def compute_page_stability(self, probs: np.ndarray) -> float:
         """
         Aggregate node-level margins into a page-level stability score.
-        Empirical counterpart of σ(P) in Theorem 1.
+        Empirical stability metric σ(P); a preliminary, unsupervised
+        reliability signal (NOT a validated drift detector).
         """
         margins = self.compute_node_margins(probs)
         if margins.size == 0:
@@ -99,7 +100,7 @@ class DriftMonitor:
         instead of raw probabilities. This allows the InferenceEngine to
         handle the mathematical details of σ calculation directly.
         """
-        # 1. Detect Drift based on Threshold (Theorem 1)
+        # 1. Flag low-stability pages (preliminary signal, threshold-based)
         drift_detected = stability_score < self.stability_threshold
 
         # 2. Update History
@@ -214,7 +215,7 @@ class ActiveLearningManager:
         request: Dict[str, Any] = {
             "page_url": page_url,
             "stability_score": stability_score,
-            "reason": "DRIFT_DETECTED: σ below threshold (cf. Theorem 1).",
+            "reason": "DRIFT_DETECTED: σ below threshold (preliminary signal).",
             "drift_context": drift_context,
             "timestamp_utc": timestamp,
         }

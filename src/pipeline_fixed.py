@@ -20,6 +20,7 @@ from typing import List, Dict, Any, Literal
 
 from src.integration.fitlayout import FitLayoutClient
 from src.learning.features import FeatureEncoder
+from src.learning import encoding
 from src.learning.graph_builder import FitLayoutParser
 from src.learning.gnn_model import SmartScrapeGNN
 from src.learning.drift_monitor import DriftMonitor, ActiveLearningManager
@@ -52,15 +53,20 @@ class SmartScrapePipeline:
         self,
         reasoning_mode: ReasoningMode = "ilp",
         use_mock: bool = False,
+        use_priors: bool = True,
+        offline: bool = False,
     ):
         torch.manual_seed(42)
         np.random.seed(42)
 
         self.reasoning_mode = reasoning_mode
         self.use_mock = use_mock
+        self.use_priors = use_priors
 
+        self.offline = offline
         self.client = FitLayoutClient()
         self.parser = FitLayoutParser()
+        self._demo_pages = self._load_demo_pages() if offline else {}
 
         # --- GNN Model ---
         self.encoder = FeatureEncoder()
@@ -94,7 +100,7 @@ class SmartScrapePipeline:
             print(
                 f"[Pipeline] WARNING: Model checkpoint '{MODEL_CHECKPOINT}' not found. "
                 "Running with random weights (heuristic-only mode). "
-                "Run train.py to generate model.pt."
+                "Run train_gnn.py to generate model.pt."
             )
             self._model_trained = False
 
@@ -102,7 +108,7 @@ class SmartScrapePipeline:
     # Public API
     # ------------------------------------------------------------------
 
-    def run(self, url: str) -> Dict[str, Any] | None:
+    def run(self, url: str, drift: float = 0.0) -> Dict[str, Any] | None:
         """
         Extract structured information from a single page URL.
 
@@ -124,11 +130,19 @@ class SmartScrapePipeline:
         # ------ Phase 2: GNN Inference ------
         raw_probs = self._run_gnn(data, raw_nodes)
 
+        # Synthetic drift: blend GNN probabilities toward uniform by
+        # `drift` in [0,1]. This genuinely lowers per-node margins, so
+        # sigma(P) drops and the scores/decision change for real.
+        if drift and drift > 0.0:
+            u = np.full_like(raw_probs, 1.0 / raw_probs.shape[1])
+            raw_probs = (1.0 - drift) * raw_probs + drift * u
+
         # ------ Phase 3: Heuristic priors (feature engineering) ------
         # These serve as strong signals for the untrained model and as
         # interpretable features when the GNN is trained.
         scores = raw_probs.copy()
-        self._inject_priors(raw_nodes, scores)
+        if self.use_priors:
+            self._inject_priors(raw_nodes, scores)
 
         # ------ Phase 4: Reasoning (ILP or Greedy) ------
         page_height = self._estimate_page_height(raw_nodes)
@@ -156,10 +170,14 @@ class SmartScrapePipeline:
             )
 
         # ------ Assemble final output ------
+        candidates = self._build_candidate_trace(raw_nodes, scores, page_height)
         final_record["_meta"] = {
             "drift_alert": bool(drift_alert),
             "stability_score": float(stability_score),
             "reasoning_mode": self.reasoning_mode,
+            "use_priors": self.use_priors,
+            "drift": float(drift),
+            "candidates": candidates,
             "model_trained": self._model_trained,
             "active_constraints": [
                 "uniqueness[title]",
@@ -178,6 +196,8 @@ class SmartScrapePipeline:
 
     def _acquire_page(self, url: str):
         """Try live FitLayout, fall back to mock if use_mock=True."""
+        if self.offline:
+            return self._acquire_offline(url)
         try:
             json_data = self.client.get_page_content(url)
             data, raw_nodes = self.parser.parse(json_data)
@@ -193,6 +213,72 @@ class SmartScrapePipeline:
 
         print("[Pipeline] use_mock=False — returning empty result.")
         return None, []
+
+
+    def _load_demo_pages(self):
+        """Load bundled offline demo pages (data/demo_pages.json)."""
+        import json, os
+        path = os.path.join("data", "demo_pages.json")
+        if not os.path.exists(path):
+            print("[Pipeline] offline=True but data/demo_pages.json missing.")
+            return {}
+        with open(path, encoding="utf-8") as f:
+            pages = json.load(f)
+        print(f"[Pipeline] Offline mode: {len(pages)} bundled demo pages.")
+        return pages
+
+    def _acquire_offline(self, url: str):
+        """Build a graph from a bundled demo page (no network/FitLayout)."""
+        page = self._demo_pages.get(url)
+        if page is None and self._demo_pages:
+            page = next(iter(self._demo_pages.values()))
+            print(f"[Pipeline] URL not in demo set; using first bundled page.")
+        if page is None:
+            return None, []
+        raw_nodes = []
+        for j, n in enumerate(page["nodes"]):
+            bbox = n.get("bbox") or [0, 0, 0, 0]
+            raw_nodes.append({
+                "id": n.get("id", j),
+                "text": n.get("text", ""),
+                "tag": n.get("tag", "div"),
+                "bbox": [float(b) for b in bbox],
+            })
+        edge_index = encoding.build_edges(raw_nodes, k=3)
+        feats = torch.stack([encoding.node_features(n) for n in raw_nodes])
+        from torch_geometric.data import Data
+        return Data(x=feats, edge_index=edge_index), raw_nodes
+
+    def _build_candidate_trace(self, raw_nodes, scores, page_height):
+        """
+        Real per-candidate scores for the UI (replaces hard-coded demo bars).
+        For title/price, return the top nodes by fused score, flagging which
+        ones the ILP constraints exclude (footer/zone/format).
+        """
+        import numpy as _np
+        from config import FOOTER_THRESHOLD
+        out = {}
+        field_idx = {"price": 0, "title": 1}
+        for field, j in field_idx.items():
+            order = _np.argsort(-scores[:, j])[:5]
+            items = []
+            for i in order:
+                node = raw_nodes[int(i)]
+                y = float(node["bbox"][1]) if node.get("bbox") else 0.0
+                excluded = []
+                if y > page_height * FOOTER_THRESHOLD:
+                    excluded.append("Γ2 footer")
+                if y > self.solver.product_zone_max_px:
+                    excluded.append("Γ3 zone")
+                if field == "price" and not self.solver._has_price_format(str(node["text"])):
+                    excluded.append("Γ4 format")
+                items.append({
+                    "text": (node["text"] or "")[:28],
+                    "score": float(scores[int(i)][j]),
+                    "excluded_by": excluded,
+                })
+            out[field] = items
+        return out
 
     def _get_mock_nodes(self):
         """
@@ -237,67 +323,48 @@ class SmartScrapePipeline:
         r"([£$€₼]|AZN)?\s*\d+([.,]\d{1,2})?\s*([£$€₼]|AZN)?"
     )
 
-    def _inject_priors(self, raw_nodes: List[Dict], scores: np.ndarray):
+    def _inject_priors(self, raw_nodes, scores):
         """
-        Inject domain-knowledge priors into the score matrix.
+        Bounded, SECONDARY priors added on top of GNN probabilities.
 
-        Implements the 'Heuristic prior' part of the hybrid model:
-        strong signals for known patterns (currency, H1 tags, y-position).
+        The GNN (range [0,1] per class) is the primary signal; these priors
+        are small nudges (|delta| <= 0.3) that change the outcome only when
+        the GNN is genuinely uncertain. Hard layout/format rules (footer,
+        product-zone, price-format) are NOT applied here - they are enforced
+        exactly by the ILP solver (Gamma2-Gamma4), so duplicating them as
+        large penalties is unnecessary and would let heuristics dominate.
         """
-        page_h = self._estimate_page_height(raw_nodes)
-
+        STOP_WORDS = {
+            "warning", "notice", "in stock", "add to basket", "add to cart",
+            "home", "sign in", "register", "this is a demo", "prices and ratings",
+        }
         for i, node in enumerate(raw_nodes):
-            text    = node.get("text", "").strip()
-            tag     = node.get("tag", "").lower()
-            bbox    = node.get("bbox", [0, 0, 0, 0])
-            y_coord = float(bbox[1]) if bbox and len(bbox) > 1 else 0.0
+            text = str(node.get("text", "")).strip()
+            tag = str(node.get("tag", "")).lower()
 
-            if len(text) < 1:
-                scores[i][0] = -100.0
-                scores[i][1] = -100.0
+            if not text:
+                scores[i][0] -= 1.0
+                scores[i][1] -= 1.0
                 continue
 
-            # --- PRICE (index 0) ---
-            has_currency = self.PRICE_PATTERN.search(text) and len(text) < 25
-            if has_currency and 150 <= y_coord <= 500:
-                scores[i][0] += 40.0   # цена в зоне продукта
-            elif has_currency:
-                scores[i][0] += 10.0   # цена но не в зоне
-            else:
-                scores[i][0] -= 20.0   # нет валютного символа — не цена
-
-            # --- TITLE (index 1) ---
-            is_price_text = bool(self.PRICE_PATTERN.search(text))
-            STOP_WORDS = {
-                "warning", "notice", "in stock", "add to basket",
-                "add to cart", "home", "sign in", "register",
-                "this is a demo", "prices and ratings",
-            }
+            is_price_text = bool(self.PRICE_PATTERN.search(text)) and len(text) < 25
             is_nav_text = (
-                "/" in text
-                or text.isdigit()
-                or any(s in text.lower() for s in STOP_WORDS)
-                or len(text) < 3
+                "/" in text or text.isdigit() or len(text) < 3
+                or any(sw in text.lower() for sw in STOP_WORDS)
             )
 
+            # PRICE (index 0): mild boost for currency-looking short text.
             if is_price_text:
-                scores[i][1] -= 50.0   # цена не может быть заголовком
-            elif is_nav_text:
-                scores[i][1] -= 50.0   # навигация/статус не заголовок
-            elif 185 <= y_coord <= 400 and 2 <= len(text) <= 200:
-                scores[i][1] += 30.0   # текст в зоне заголовка
-                if tag == "h1":
-                    scores[i][1] += 20.0
-            elif y_coord < 185:
-                scores[i][1] -= 30.0   # шапка сайта
+                scores[i][0] += 0.3
 
-            # --- Зональные штрафы ---
-            if y_coord > 500:
-                scores[i][0] -= 40.0
-                scores[i][1] -= 40.0
-            if y_coord > page_h * FOOTER_THRESHOLD:
-                scores[i][0] -= 30.0
-                scores[i][1] -= 30.0
+            # TITLE (index 1): boost a prominent H1; discourage price/nav text.
+            if tag == "h1":
+                scores[i][1] += 0.3
+            if is_price_text:
+                scores[i][1] -= 0.3
+            elif is_nav_text:
+                scores[i][1] -= 0.3
+
 
     # ------------------------------------------------------------------
     # Phase 4a: ILP reasoning
