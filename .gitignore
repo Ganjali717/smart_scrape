@@ -22,3 +22,13 @@ src/learning/active_learning_queries.json
 .DS_Store
 .idea/
 .vscode/
+
+# v2 artefacts
+cache/
+results/
+data/swde/
+*.pt
+.pytest_cache/
+structure.txt
+src/learning/drift_history.json
+src/learning/active_learning_queries.json

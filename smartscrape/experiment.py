@@ -1,0 +1,264 @@
+"""
+End-to-end experiment runner.
+
+    python -m smartscrape run configs/experiments/swde_camera.yaml
+
+For every seed: split sites -> train the scorer -> score test pages (clean and
+under each drift setting) -> decode with every method -> metrics. Writes:
+
+    <out>/results.csv        one row per (seed, setting, method)
+    <out>/summary.csv        mean and std over seeds
+    <out>/reliability.json   AUROC/AUPRC of the risk signals per setting
+    <out>/provenance_sample.json  a few full ILP records with their audit trail
+    <out>/model_seed<k>.pt   trained scorers
+"""
+
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+import os
+import random
+import time
+from collections import defaultdict
+from typing import Dict, List, Sequence
+
+import numpy as np
+import torch
+import yaml
+
+from .data import Page, load_pages, save_pages, text_matches
+from .calibrate import calibrate
+from .drift import apply_drift
+from .evaluate import aggregate, field_outcomes, record_correct, reliability_auc
+from .features import FeatureEncoder
+from .reliability import disagreement, page_stability, risk
+from .schema import Schema, save_schema
+from .solver import ConstraintSolver, decode_argmax, decode_filtered
+from .train import encode_pages, save_bundle, score_pages, train_scorer
+
+
+# ---------------------------------------------------------------------------
+# Data
+# ---------------------------------------------------------------------------
+def load_dataset(cfg: dict, cache_dir: str, log=print) -> List[Page]:
+    key = hashlib.md5(json.dumps(cfg, sort_keys=True).encode()).hexdigest()[:10]
+    path = os.path.join(cache_dir, f"pages_{cfg['type']}_{key}.jsonl")
+    if os.path.exists(path):
+        log(f"[data] cached pages: {path}")
+        return load_pages(path)
+    t0 = time.time()
+    if cfg["type"] == "swde":
+        from .loaders import load_swde_vertical
+        pages = load_swde_vertical(cfg["html_root"], cfg["gt_parquet"], cfg["vertical"],
+                                   sites=cfg.get("sites"), max_pages_per_site=cfg.get("max_pages_per_site"))
+    elif cfg["type"] == "legacy_json":
+        from .loaders import load_legacy_json
+        pages = load_legacy_json(cfg["path"], site=cfg.get("site"))
+        if cfg.get("max_pages"):
+            pages = pages[: cfg["max_pages"]]
+    elif cfg["type"] == "jsonl":
+        pages = load_pages(cfg["path"])
+    else:
+        raise ValueError(f"unknown dataset type {cfg['type']}")
+    os.makedirs(cache_dir, exist_ok=True)
+    save_pages(pages, path)
+    log(f"[data] parsed {len(pages)} pages in {time.time() - t0:.1f}s -> {path}")
+    return pages
+
+
+def label_coverage(pages: Sequence[Page], schema: Schema) -> Dict[str, float]:
+    """Share of (page, field with gold) where some node text matches gold: an upper bound on F1."""
+    cov = {}
+    for f in schema.field_names:
+        have = [p for p in pages if p.gold.get(f)]
+        cov[f] = sum(1 for p in have if f in set(p.labels.values())) / max(1, len(have))
+    return cov
+
+
+def split_sites(pages: Sequence[Page], split: dict, seed: int):
+    sites = sorted({p.site for p in pages})
+    rng = random.Random(seed)
+    if split["type"] == "cross_site":
+        rng.shuffle(sites)
+        k, v = split.get("train_sites", 3), split.get("val_sites", 1)
+        tr, va, te = set(sites[:k]), set(sites[k:k + v]), set(sites[k + v:])
+        return ([p for p in pages if p.site in tr], [p for p in pages if p.site in va],
+                [p for p in pages if p.site in te])
+    if split["type"] == "random":
+        idx = list(range(len(pages)))
+        rng.shuffle(idx)
+        a = int(len(idx) * split.get("train", 0.6))
+        b = a + int(len(idx) * split.get("val", 0.1))
+        return ([pages[i] for i in idx[:a]], [pages[i] for i in idx[a:b]], [pages[i] for i in idx[b:]])
+    raise ValueError(split["type"])
+
+
+# ---------------------------------------------------------------------------
+# Decoding
+# ---------------------------------------------------------------------------
+def build_methods(schema: Schema, top_k: int, variants: Sequence[str], raw_schema: Schema = None):
+    """Return {name: callable(page, scores) -> Record}. `schema` may be calibrated; `raw_schema` is the
+    hand-written one (used by 'ilp-uncalibrated')."""
+    methods = {}
+    raw_schema = raw_schema or schema
+    for v in variants:
+        if v == "ilp-uncalibrated":
+            methods[v] = ConstraintSolver(raw_schema, top_k=top_k).solve
+            continue
+        if v == "argmax":
+            methods[v] = lambda p, s: decode_argmax(p, s, schema)
+        elif v == "filtered":
+            methods[v] = lambda p, s: decode_filtered(p, s, schema)
+        elif v == "ilp":
+            solver = ConstraintSolver(schema, top_k=top_k)
+            methods[v] = solver.solve
+        elif v.startswith("ilp-"):
+            # ablation: ilp-<kind>+<kind>... keeps only the listed constraint kinds
+            kinds = set(v[4:].split("+"))
+            solver = ConstraintSolver(schema.subset(kinds=kinds), top_k=top_k)
+            methods[v] = solver.solve
+        else:
+            raise ValueError(f"unknown method {v}")
+    return methods
+
+
+def old_sigma(scores: np.ndarray) -> float:
+    """ICWE-version stability: mean over ALL nodes of top1 - top2 class probability."""
+    if scores.shape[0] == 0:
+        return 0.0
+    logits = np.concatenate([scores, np.zeros((scores.shape[0], 1))], axis=1)
+    p = np.exp(logits - logits.max(1, keepdims=True))
+    p /= p.sum(1, keepdims=True)
+    s = np.sort(p, axis=1)
+    return float((s[:, -1] - s[:, -2]).mean())
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+def run(config_path: str, log=print) -> str:
+    with open(config_path, encoding="utf-8") as f:
+        cfg = yaml.safe_load(f)
+    out_dir = cfg.get("output", os.path.join("results", cfg["name"]))
+    os.makedirs(out_dir, exist_ok=True)
+    schema = Schema.load(cfg["schema"])
+    pages = load_dataset(cfg["dataset"], cfg.get("cache_dir", "cache"), log)
+    log(f"[data] {len(pages)} pages, {len({p.site for p in pages})} sites; "
+        f"label coverage {json.dumps({k: round(v, 3) for k, v in label_coverage(pages, schema).items()})}")
+
+    mcfg = cfg.get("model", {})
+    encoder = FeatureEncoder(sentence_model=mcfg.get("sentence_model"))
+    methods_cfg = cfg.get("methods", ["argmax", "filtered", "ilp"])
+    top_k = cfg.get("top_k", 20)
+    drift_settings = cfg.get("drift", [])
+    rows: List[dict] = []
+    rel_rows: Dict[str, Dict[str, list]] = defaultdict(lambda: defaultdict(list))
+    provenance = []
+
+    for seed in cfg.get("seeds", [0]):
+        tr, va, te = split_sites(pages, cfg["split"], seed)
+        tr = [p for p in tr if p.labels]  # train only on pages with at least one labelled node
+        log(f"\n=== seed {seed}: train {len(tr)} pages ({sorted({p.site for p in tr})}), "
+            f"val {len(va)} ({sorted({p.site for p in va})}), test {len(te)} ===")
+        t0 = time.time()
+        enc_tr = encode_pages(tr, schema, encoder)
+        enc_va = encode_pages(va, schema, encoder)
+        log(f"[train] encoded in {time.time() - t0:.1f}s, feature dim {encoder.dim}")
+        model = train_scorer(enc_tr, enc_va, schema, encoder.dim,
+                             epochs=mcfg.get("epochs", 30), lr=mcfg.get("lr", 2e-3),
+                             hidden=mcfg.get("hidden", 128), layers=mcfg.get("layers", 2),
+                             pos_weight=mcfg.get("pos_weight", 20.0), patience=mcfg.get("patience", 6),
+                             seed=seed, log=log)
+        save_bundle(model, schema, mcfg, os.path.join(out_dir, f"model_seed{seed}.pt"))
+        log(f"[train] done in {time.time() - t0:.1f}s, temperature {float(model.temperature):.2f}")
+
+        title_pool = {}
+        for p in pages:
+            for f in schema.field_names:
+                if schema.field(f).type == "text" and schema.field(f).cardinality == "one":
+                    title_pool.setdefault(p.site, []).extend(p.gold.get(f, [])[:1])
+
+        settings = [("clean", None)] + [(d["name"], d) for d in drift_settings]
+        ccfg = cfg.get("calibrate", {"enabled": True})
+        if ccfg.get("enabled", True):
+            seed_schema, report = calibrate(schema, list(tr) + list(va),
+                                            min_support=ccfg.get("min_support", 0.95),
+                                            quantile=ccfg.get("quantile", 0.95))
+            with open(os.path.join(out_dir, f"calibration_seed{seed}.json"), "w") as f:
+                json.dump(report, f, indent=2)
+            save_schema(seed_schema, os.path.join(out_dir, f"schema_calibrated_seed{seed}.yaml"))
+            log(f"[calibrate] active: {[c.name for c in seed_schema.constraints]}")
+        else:
+            seed_schema = schema
+        methods = build_methods(seed_schema, top_k, methods_cfg, raw_schema=schema)
+        for sname, d in settings:
+            if d is None:
+                test_pages = te
+            else:
+                test_pages = [apply_drift(p, d["kinds"], d.get("severity", 0.3), seed,
+                                          pool_titles=title_pool.get(p.site)) for p in te]
+            enc_te = encode_pages(test_pages, schema, encoder)
+            scores = score_pages(model, enc_te)
+            for mname, fn in methods.items():
+                t1 = time.time()
+                recs = [fn(p, s) for p, s in zip(test_pages, scores)]
+                metrics = aggregate(test_pages, recs, schema)
+                metrics["ms_per_page"] = 1000 * (time.time() - t1) / max(1, len(recs))
+                rows.append({"seed": seed, "setting": sname, "method": mname, **metrics})
+                log(f"  [{sname:>18}] {mname:<28} F1 {metrics['f1/macro']:.3f}  EM {metrics['exact_match']:.3f}  "
+                    f"viol {metrics['violation_rate']:.3f}")
+                if mname == "ilp":
+                    base = [decode_argmax(p, s, schema) for p, s in zip(test_pages, scores)]
+                    for p, r, b, s in zip(test_pages, recs, base, scores):
+                        wrong = not record_correct(field_outcomes(p, r, schema))
+                        dis = disagreement(r, b)
+                        rel_rows[sname]["wrong"].append(wrong)
+                        rel_rows[sname]["risk"].append(risk(r, b))
+                        rel_rows[sname]["neg_margin"].append(-page_stability(r))
+                        rel_rows[sname]["disagreement"].append(dis["field_disagreement"] + dis["objective_gap"])
+                        rel_rows[sname]["old_sigma_neg"].append(-old_sigma(s))
+                    if sname == "clean" and len(provenance) < 5:
+                        for p, r in list(zip(test_pages, recs))[:5 - len(provenance)]:
+                            provenance.append({"page": p.page_id, "gold": p.gold, **r.provenance()})
+
+    _write_rows(os.path.join(out_dir, "results.csv"), rows)
+    _write_summary(os.path.join(out_dir, "summary.csv"), rows)
+    rel = {}
+    for sname, cols in rel_rows.items():
+        rel[sname] = {sig: reliability_auc(cols[sig], cols["wrong"])
+                      for sig in ("risk", "neg_margin", "disagreement", "old_sigma_neg")}
+    with open(os.path.join(out_dir, "reliability.json"), "w") as f:
+        json.dump(rel, f, indent=2)
+    with open(os.path.join(out_dir, "provenance_sample.json"), "w") as f:
+        json.dump(provenance, f, indent=2, ensure_ascii=False)
+    log(f"\n[done] results in {out_dir}")
+    log(json.dumps(rel, indent=1))
+    return out_dir
+
+
+def _write_rows(path, rows):
+    if not rows:
+        return
+    keys = list(rows[0].keys())
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=keys)
+        w.writeheader()
+        w.writerows(rows)
+
+
+def _write_summary(path, rows):
+    groups = defaultdict(list)
+    for r in rows:
+        groups[(r["setting"], r["method"])].append(r)
+    metrics = [k for k in rows[0] if k not in ("seed", "setting", "method")] if rows else []
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["setting", "method", "n_seeds"] + [f"{m}_{s}" for m in metrics for s in ("mean", "std")])
+        for (s, m), rs in groups.items():
+            vals = []
+            for k in metrics:
+                a = np.array([r[k] for r in rs], dtype=float)
+                vals += [round(float(a.mean()), 4), round(float(a.std()), 4)]
+            w.writerow([s, m, len(rs)] + vals)

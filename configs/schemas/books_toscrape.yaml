@@ -1,0 +1,11 @@
+# Original ICWE setting: books.toscrape.com product pages (rendered, with boxes).
+name: books_toscrape
+fields:
+  title: {type: text, cardinality: one}
+  price: {type: price, cardinality: one}
+constraints:
+  - {kind: mutual_exclusion, rank: 10}
+  - {kind: format, field: price, rank: 8}
+  - {kind: exclude_regions, regions: [footer, nav], fields: all, rank: 3}
+  - {kind: proximity, a: price, b: title, max_distance: 3.0, rank: 2}   # 3.0 = 300 px between box centres
+  - {kind: ordering, before: title, after: price, rank: 1}

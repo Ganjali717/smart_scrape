@@ -1,0 +1,12 @@
+# Sanity check on the original annotations (one site, rendered boxes): random page split.
+name: books_legacy
+dataset: {type: legacy_json, path: data/labeled_2.json, max_pages: 300}
+schema: configs/schemas/books_toscrape.yaml
+split: {type: random, train: 0.5, val: 0.1}
+seeds: [0]
+model: {hidden: 64, layers: 2, epochs: 8, lr: 0.002, pos_weight: 20, patience: 3}
+methods: [argmax, filtered, ilp]
+drift:
+  - {name: distractor_block, kinds: [distractor_block], severity: 0.6}
+cache_dir: cache
+output: results/books_legacy

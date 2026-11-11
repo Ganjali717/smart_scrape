@@ -1,227 +1,103 @@
-# 🕸️ SmartScrape
+# SmartScrape v2
 
-**A Neuro-Symbolic Framework for Web Information Extraction**
+**Constraint-guided neural web information extraction.**
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.x-red.svg)](https://streamlit.io)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-orange.svg)](https://pytorch.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-SmartScrape combines a **Graph Neural Network (GNN)** for node scoring with an **Integer Linear Programming (ILP)** constraint solver to extract structured information from web pages — reliably, auditably, and without breaking when page templates change.
-
----
-
-## ✨ Key Features
-
-| Feature | Description |
-|---|---|
-| 🧠 **GNN Inference** | 2-layer GCN encodes DOM nodes using text, visual geometry, and tag features |
-| 🔒 **ILP Constraint Solver** | Enforces uniqueness, footer exclusion, product zone, and format constraints |
-| 📊 **Proof-Carrying Output** | Every record includes which constraints were applied and whether any were violated |
-| 📡 **Drift Detection** | Stability metric σ(P) monitors extraction confidence and triggers active learning |
-| 🔬 **Ablation Study** | Toggle between ILP and Greedy modes to see the constraint benefit live |
-| 🏷️ **Annotation Tool** | Built-in Streamlit labeling UI to build your own training dataset |
-
----
-
-## 🏗️ Architecture
+A relational graph neural network scores the text nodes of a web page; an
+integer linear program then picks the best *record* that satisfies a
+declarative schema: one title, one price, the price near the title, nothing
+from the footer, and so on. Every record comes with an audit trail
+(provenance) and a label-free risk score that flags pages for review.
 
 ```
-URL
- │
- ▼
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────┐
-│  FitLayout API  │────▶│  Feature Graph   │────▶│  GNN (GCN)  │
-│ (Puppeteer/VIPS)│     │  Builder (KNN)   │     │  147-dim    │
-└─────────────────┘     └──────────────────┘     └──────┬──────┘
-                                                         │ scores
-                                                         ▼
-                                                ┌─────────────────┐
-                                                │   ILP Solver    │
-                                                │  (OR-Tools)     │
-                                                │  Γ1 Uniqueness  │
-                                                │  Γ2 Footer trap │
-                                                │  Γ3 Product zone│
-                                                │  Γ4 Format      │
-                                                └────────┬────────┘
-                                                         │
-                                                         ▼
-                                               ┌──────────────────┐
-                                               │  Proof-Carrying  │
-                                               │  Record + σ(P)   │
-                                               └──────────────────┘
+page (raw HTML or FitLayout render)
+  └─ text nodes + DOM / reading-order / spatial relations      smartscrape/loaders.py, graph.py
+       └─ R-GCN scorer: s(n, f) = log p(f|n) − log p(none|n)    smartscrape/model.py, train.py
+            └─ constraint library compiled to an ILP             smartscrape/schema.py, solver.py
+                 ├─ record + provenance                          smartscrape/extract.py
+                 └─ reliability: stability margin, disagreement  smartscrape/reliability.py
 ```
 
----
-
-## 📈 Results
-
-Evaluated on **51 annotated pages** from books.toscrape.com:
-
-| Method | Title Acc. | Price Acc. | Both Correct | Violations |
-|---|---|---|---|---|
-| Greedy (no Γ) | 83% | 80% | 77% | 4 |
-| **SmartScrape ILP (Γ)** | **97%** | **97%** | **93%** | **0** |
-
-The ILP solver eliminates all constraint violations and improves accuracy by +14 pp (title) and +17 pp (price) over the greedy baseline.
-
----
-
-## 🚀 Quick Start
-
-### 1. Clone and install
+## Install
 
 ```bash
-git clone https://github.com/yourusername/smartscrape.git
-cd smartscrape
-python -m venv venv
-
-# Windows
-.\venv\Scripts\activate
-
-# Linux / Mac
-source venv/bin/activate
-
+python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install torch --index-url https://download.pytorch.org/whl/cu128   # pick the CUDA build for your GPU
 pip install -r requirements.txt
+pytest -q tests/                                         # 14 tests, < 1 s
 ```
 
-### 2. Configure environment
+## Run an experiment
 
 ```bash
-cp .env.example .env
-# Edit .env and add your FitLayout token:
-# FITLAYOUT_TOKEN=Bearer eyJ...
+python scripts/download_swde.py camera                  # ~10 MB; or: all
+python -m smartscrape run configs/experiments/swde_camera_quick.yaml   # ~3 min on CPU
+python -m smartscrape run configs/experiments/swde_camera.yaml         # full: 3 seeds, all pages, GPU
 ```
 
-### 3. Run the demo
+Outputs in `results/<name>/`:
+
+| File | Content |
+|---|---|
+| `results.csv` | one row per seed × setting (clean / each drift) × method: per-field F1, macro F1, exact match, violation rate, ms/page |
+| `summary.csv` | mean and std over seeds |
+| `reliability.json` | AUROC / AUPRC of each risk signal for predicting a wrong record |
+| `calibration_seed*.json` | which constraints survived calibration on the training sites, with their support |
+| `provenance_sample.json` | full ILP records with competitors, active and relaxed constraints |
+| `model_seed*.pt` | trained scorer bundles, usable by `extract` |
+
+### Methods compared
+
+| Name | What it does |
+|---|---|
+| `argmax` | best node per field, no constraints (GNN-only baseline) |
+| `filtered` | node-local constraints only (format, regions), then best node per field |
+| `ilp` | full constraint set, parameters calibrated on the training sites |
+| `ilp-uncalibrated` | same constraints with the hand-written parameters |
+| `ilp-<kind>+<kind>` | ablation keeping only the listed constraint kinds |
+
+### Drift settings
+
+Applied to the **input page**, never to model outputs: `wrapper_insertion`,
+`tag_rename`, `sibling_reorder`, `distractor_block` (look-alike "related
+products" block, half of the time without any region hint), and combinations.
+
+## Extract from a page
 
 ```bash
-streamlit run app.py
+python -m smartscrape extract --model results/swde_camera/model_seed0.pt \
+    --schema results/swde_camera/schema_calibrated_seed0.yaml --html some_page.html
+python -m smartscrape extract ... --url https://example.com/product   # rendered by FitLayout (FITLAYOUT_TOKEN in .env)
 ```
 
-Open http://localhost:8501 in your browser.
+Returns the record, its violations (normally none), a risk score with a
+`needs_review` flag, and the provenance trace.
 
----
+## Schemas
 
-## 🏋️ Training Your Own Model
+`configs/schemas/*.yaml` declare fields (`text`, `price`, `number`, `date`,
+`url`; cardinality `one` or `optional`) and constraints: `mutual_exclusion`,
+`format`, `exclude_regions`, `position_band`, `proximity`, `ordering`. Each
+constraint has a `rank`; when a page makes the program infeasible, constraints
+are relaxed from the lowest rank up and the relaxation is recorded.
 
-### Step 1 — Annotate pages
+## First measurements (quick config, CPU, 1 seed — not paper numbers)
 
-```bash
-streamlit run annotate.py
-```
+SWDE camera, 60 pages per site, trained on 3 sites, tested on 6 unseen sites:
 
-Label each page node as `title`, `price`, or `other`. Saves to `data/labeled.json`.
-Aim for at least 20-50 pages for good results.
+| Method | macro F1 clean | violation rate clean | macro F1, all drifts combined |
+|---|---|---|---|
+| argmax | 0.589 | 0.642 | 0.376 |
+| filtered | 0.600 | 0.503 | 0.378 |
+| ilp (calibrated) | 0.599 | 0.250 | 0.357 |
+| ilp-uncalibrated | 0.544 | 0.014 | 0.306 |
 
-### Step 2 — Train the GNN
+What this already shows: hand-set cross-field constraints remove violations
+but cost F1 because they do not hold on every site (e.g. Amazon puts the
+price above the title); calibration on training sites recovers the F1. The
+scorer is the bottleneck in this small run (price F1 ≈ 0.31). The full
+configuration on GPU is the next step.
 
-```bash
-python train_gnn.py
-```
+## Legacy code
 
-Output: `model.pt` — copy this to the project root.
-
-### Step 3 — Run with trained model
-
-```bash
-streamlit run app.py
-```
-
-The header will show **Model trained: True** when the model is loaded correctly.
-
----
-
-## 📁 Project Structure
-
-```
-smartscrape/
-├── app.py                      # Main Streamlit demo application
-├── annotate.py                 # Data annotation tool
-├── train_gnn.py                # GNN training script
-├── config.py                   # Configuration (reads from .env)
-├── model.pt                    # Trained GNN weights (not in repo)
-├── data/
-│   └── labeled.json            # Annotated training data
-└── src/
-    ├── pipeline_fixed.py       # Main extraction pipeline
-    ├── integration/
-    │   └── fitlayout.py        # FitLayout API client
-    ├── learning/
-    │   ├── gnn_model.py        # GCN architecture
-    │   ├── features.py         # Node feature encoder
-    │   ├── graph_builder.py    # Graph construction (KNN edges)
-    │   └── drift_monitor.py    # σ(P) stability metric
-    └── reasoning/
-        ├── solver_fixed.py     # ILP constraint solver (OR-Tools)
-        └── engine.py           # Greedy inference (ablation baseline)
-```
-
----
-
-## 🔧 Configuration
-
-| Variable | Default | Description |
-|---|---|---|
-| `FITLAYOUT_TOKEN` | — | FitLayout API Bearer token (required) |
-| `FITLAYOUT_API_URL` | `https://layout.fit.vutbr.cz/api` | FitLayout endpoint |
-| `SMARTSCRAPE_MODEL_PATH` | `model.pt` | Path to trained GNN weights |
-| `FOOTER_THRESHOLD` | `0.80` | Footer zone cutoff (fraction of page height) |
-| `STABILITY_THRESHOLD` | `0.60` | σ(P) threshold for drift detection |
-
----
-
-## 🎮 Demo Scenarios
-
-Once the app is running, you can explore:
-
-1. **Live Extraction** — paste any `books.toscrape.com` URL and watch the pipeline extract title and price with bounding-box overlay
-2. **Constraint Proof** — inspect the proof object showing active constraints Γ1–Γ4
-3. **Drift Simulation** — use the chaos engineering slider to inject noise and watch σ(P) drop below the threshold
-4. **Ablation Study** — toggle ILP ↔ Greedy in the sidebar and see accuracy change in real time
-5. **Batch Evaluation** — run the benchmark over all 51 labeled pages and view F1 scores and σ(P) distribution
-
----
-
-## 🧮 Formal Constraints
-
-The ILP solver enforces:
-
-```prolog
-Γ1 UNIQUENESS:    ∑ x[i, Price] ≤ 1,   ∑ x[i, Title] ≤ 1
-Γ2 FOOTER TRAP:   y(n) > 0.8 × PageHeight  ⇒  x[n, Title] = x[n, Price] = 0
-Γ3 PRODUCT ZONE:  y(n) > 500px           ⇒  x[n, Title] = x[n, Price] = 0
-Γ4 FORMAT:        x[n, Price] = 1        ⇒  HasCurrency(n) ∧ IsNumeric(n)
-```
-
----
-
-## 📄 Citation
-
-If you use SmartScrape in your research, please cite:
-
-```bibtex
-@inproceedings{imanov2026smartscrape,
-  title     = {SmartScrape: A Neuro-Symbolic Web Information Extraction Demo},
-  author    = {Imanov, Ganjali},
-  booktitle = {Proceedings of the 26th International Conference on Web Engineering (ICWE)},
-  year      = {2026},
-  address   = {Lyon, France},
-  publisher = {Springer}
-}
-```
-
----
-
-## 🙏 Acknowledgements
-
-This work was developed at the Faculty of Information Technology, Brno University of Technology.
-Thanks to doc. Ing. Radek Burget, Ph.D. for supervision and to Prof. RNDr. Alexandr Meduna, CSc. for guidance.
-
-The system integrates with [FitLayout](https://github.com/FitLayout/FitLayout) — a web page segmentation and analysis framework developed at BUT FIT.
-
----
-
-## 📜 License
-
-MIT License — see [LICENSE](LICENSE) for details.
+`src/`, `app.py`, `annotate.py`, `train_gnn.py` are the ICWE prototype and are
+kept unchanged for reference. New work goes into `smartscrape/`.

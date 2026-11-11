@@ -1,0 +1,13 @@
+# SWDE "camera" vertical: one product record per page.
+name: swde_camera
+fields:
+  product_title: {type: text, cardinality: one}
+  price:         {type: price, cardinality: one}
+  manufacturer:  {type: text, cardinality: optional}
+constraints:
+  # rank: lower = relaxed first when the program is infeasible
+  - {kind: mutual_exclusion, rank: 10}
+  - {kind: format, field: price, rank: 8}
+  - {kind: exclude_regions, regions: [footer, nav], fields: all, rank: 3}
+  - {kind: proximity, a: price, b: product_title, max_distance: 14, rank: 2}
+  - {kind: ordering, before: product_title, after: price, rank: 1}
