@@ -111,7 +111,21 @@ def split_sites(pages: Sequence[Page], split: dict, seed: int):
 # ---------------------------------------------------------------------------
 # Decoding
 # ---------------------------------------------------------------------------
-def build_methods(schema: Schema, top_k: int, variants: Sequence[str], raw_schema: Schema = None):
+def tune_soft_lambda(schema: Schema, pages: Sequence[Page], scores: Sequence[np.ndarray], top_k: int,
+                     grid: Sequence[float], log=print) -> float:
+    """Pick the penalty for soft cross-field constraints by macro F1 on validation sites."""
+    best_lam, best_f1 = None, -1.0
+    for lam in grid:
+        solver = ConstraintSolver(schema, top_k=top_k, soft_lambda=float(lam))
+        f1 = aggregate(pages, [solver.solve(p, s) for p, s in zip(pages, scores)], schema)["f1/macro"]
+        log(f"  [soft] lambda={lam:<6} val F1 {f1:.3f}")
+        if f1 > best_f1 + 1e-9:
+            best_lam, best_f1 = float(lam), f1
+    return best_lam
+
+
+def build_methods(schema: Schema, top_k: int, variants: Sequence[str], raw_schema: Schema = None,
+                  soft_lambda: float = None):
     """Return {name: callable(page, scores) -> Record}. `schema` may be calibrated; `raw_schema` is the
     hand-written one (used by 'ilp-uncalibrated')."""
     methods = {}
@@ -119,6 +133,9 @@ def build_methods(schema: Schema, top_k: int, variants: Sequence[str], raw_schem
     for v in variants:
         if v == "ilp-uncalibrated":
             methods[v] = ConstraintSolver(raw_schema, top_k=top_k).solve
+            continue
+        if v == "ilp-soft":
+            methods[v] = ConstraintSolver(schema, top_k=top_k, soft_lambda=soft_lambda).solve
             continue
         if v == "argmax":
             methods[v] = lambda p, s: decode_argmax(p, s, schema)
@@ -198,7 +215,8 @@ def run(config_path: str, log=print) -> str:
         f"label coverage {json.dumps({k: round(v, 3) for k, v in label_coverage(pages, schema).items()})}")
 
     mcfg = cfg.get("model", {})
-    encoder = FeatureEncoder(sentence_model=mcfg.get("sentence_model"))
+    encoder = FeatureEncoder(sentence_model=mcfg.get("sentence_model"),
+                             exclude=mcfg.get("exclude_features", []))
     methods_cfg = cfg.get("methods", ["argmax", "filtered", "ilp"])
     top_k = cfg.get("top_k", 20)
     drift_settings = cfg.get("drift", [])
@@ -241,7 +259,15 @@ def run(config_path: str, log=print) -> str:
             log(f"[calibrate] active: {[c.name for c in seed_schema.constraints]}")
         else:
             seed_schema = schema
-        methods = build_methods(seed_schema, top_k, methods_cfg, raw_schema=schema)
+        soft_lambda = None
+        if "ilp-soft" in methods_cfg:
+            val_scores = score_pages(model, enc_va)
+            soft_lambda = tune_soft_lambda(seed_schema, va, val_scores, top_k,
+                                           cfg.get("soft_lambda_grid", [0.25, 0.5, 1, 2, 4, 8]), log)
+            log(f"[soft] chosen lambda = {soft_lambda}")
+            with open(os.path.join(out_dir, f"soft_lambda_seed{seed}.json"), "w") as f:
+                json.dump({"lambda": soft_lambda}, f)
+        methods = build_methods(seed_schema, top_k, methods_cfg, raw_schema=schema, soft_lambda=soft_lambda)
         for sname, d in settings:
             if d is None:
                 test_pages = te
@@ -257,7 +283,8 @@ def run(config_path: str, log=print) -> str:
             for mname, fn in methods.items():
                 t1 = time.time()
                 recs = [fn(p, s) for p, s in zip(test_pages, scores)]
-                metrics = aggregate(test_pages, recs, schema)
+                metrics = aggregate(test_pages, recs, seed_schema)
+                metrics["violation_rate_handwritten"] = aggregate(test_pages, recs, schema)["violation_rate"]
                 metrics["ms_per_page"] = 1000 * (time.time() - t1) / max(1, len(recs))
                 rows.append({"seed": seed, "setting": sname, "method": mname, **metrics})
                 log(f"  [{sname:>18}] {mname:<28} F1 {metrics['f1/macro']:.3f}  EM {metrics['exact_match']:.3f}  "

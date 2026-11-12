@@ -22,6 +22,14 @@ from sklearn.feature_extraction.text import HashingVectorizer
 from .data import Page
 from .formats import is_date, is_number, is_price
 
+
+def _cuda() -> bool:
+    try:
+        import torch
+        return torch.cuda.is_available()
+    except ImportError:
+        return False
+
 TAGS = ["div", "span", "a", "p", "li", "td", "th", "tr", "h1", "h2", "h3", "h4", "h5", "h6",
         "b", "strong", "em", "i", "font", "label", "button", "option", "dd", "dt", "small", "big",
         "u", "center", "title", "img", "table", "ul", "form", "input", "select", "textarea"]
@@ -40,14 +48,22 @@ BASE_DIM = 256 + 64 + 32 + (len(TAGS) + 1) + N_HAND + N_GEOM
 
 
 class FeatureEncoder:
-    def __init__(self, sentence_model: Optional[str] = None, device: str = "cpu"):
+    BLOCKS = {"char": 256, "prev": 64, "path": 32, "tag": len(TAGS) + 1, "hand": N_HAND, "geom": N_GEOM}
+
+    def __init__(self, sentence_model: Optional[str] = None, device: Optional[str] = None,
+                 exclude: Optional[List[str]] = None):
         self.sentence_model_name = sentence_model
         self._st = None
-        self.device = device
+        self.device = device or ("cuda" if _cuda() else "cpu")
+        self.exclude = set(exclude or [])
+        unknown = self.exclude - set(self.BLOCKS)
+        if unknown:
+            raise ValueError(f"unknown feature blocks {unknown}; known: {sorted(self.BLOCKS)}")
 
     @property
     def dim(self) -> int:
-        return BASE_DIM + (self._st_dim() if self.sentence_model_name else 0)
+        base = sum(d for b, d in self.BLOCKS.items() if b not in self.exclude)
+        return base + (self._st_dim() if self.sentence_model_name else 0)
 
     def _st_dim(self) -> int:
         self._load_st()
@@ -66,14 +82,15 @@ class FeatureEncoder:
         prev = [""] + texts[:-1]
         paths = ["/".join(nd.xpath.split("/")[-4:]) if nd.xpath else nd.tag for nd in page.nodes]
 
-        blocks = [
-            _char.transform(texts).toarray(),
-            _word.transform(prev).toarray(),
-            _path.transform(paths).toarray(),
-            self._tags(page),
-            self._hand(page),
-            self._geom(page),
-        ]
+        makers = {
+            "char": lambda: _char.transform(texts).toarray(),
+            "prev": lambda: _word.transform(prev).toarray(),
+            "path": lambda: _path.transform(paths).toarray(),
+            "tag": lambda: self._tags(page),
+            "hand": lambda: self._hand(page),
+            "geom": lambda: self._geom(page),
+        }
+        blocks = [makers[b]() for b in self.BLOCKS if b not in self.exclude]
         if self.sentence_model_name:
             self._load_st()
             blocks.append(self._st.encode(texts, batch_size=256, normalize_embeddings=True,

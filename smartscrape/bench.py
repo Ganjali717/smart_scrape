@@ -114,7 +114,7 @@ def run_bench(model_path: str, schema_path: str, pages_path: str, sizes: Sequenc
     schema = Schema.load(schema_path)
     if list(bundle["fields"]) != schema.field_names:
         raise ValueError("model and schema fields differ")
-    encoder = FeatureEncoder(sentence_model=bundle.get("sentence_model"))
+    encoder = FeatureEncoder(sentence_model=bundle.get("sentence_model"), exclude=bundle.get("exclude_features", []))
     corpus = load_pages(pages_path)
     rows = []
     for n in sizes:

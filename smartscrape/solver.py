@@ -157,12 +157,24 @@ def decode_filtered(page: Page, scores: np.ndarray, schema: Schema) -> Record:
 # ---------------------------------------------------------------------------
 # ILP solver
 # ---------------------------------------------------------------------------
+SOFTENABLE = {"proximity", "ordering"}
+
+
 class ConstraintSolver:
-    def __init__(self, schema: Schema, top_k: int = 20, backend: str = "SCIP", time_limit_ms: int = 2000):
+    """
+    soft_lambda: None -> all constraints hard. A number -> cross-field constraints (proximity,
+    ordering) become soft: each violated row costs `soft_lambda` in the objective (score units,
+    i.e. log-odds). lambda is tuned on validation sites, so constraints that do not transfer to
+    new sites are automatically weakened instead of forcing wrong choices.
+    """
+
+    def __init__(self, schema: Schema, top_k: int = 20, backend: str = "SCIP", time_limit_ms: int = 2000,
+                 soft_lambda: Optional[float] = None):
         self.schema = schema
         self.top_k = top_k
         self.backend = backend
         self.time_limit_ms = time_limit_ms
+        self.soft_lambda = soft_lambda
 
     # candidate sets after node-local constraints
     def candidates(self, page: Page, scores: np.ndarray, constraints: Sequence[ConstraintSpec]
@@ -219,8 +231,20 @@ class ConstraintSolver:
             else:
                 solver.Add(sum(vars_f) <= 1)
 
+        lam = self.soft_lambda
+        slacks = []
+
+        def add_row(lhs, rhs, soft: bool):
+            if soft:
+                z = solver.BoolVar(f"z_{len(slacks)}")
+                slacks.append(z)
+                solver.Add(lhs <= rhs + z)
+            else:
+                solver.Add(lhs <= rhs)
+
         for c in active:
             p = c.params
+            soft = lam is not None and c.kind in SOFTENABLE
             if c.kind == "mutual_exclusion":
                 by_node: Dict[int, list] = {}
                 for (i, f), v in x.items():
@@ -232,21 +256,20 @@ class ConstraintSolver:
                 a, b, dmax = p["a"], p["b"], float(p.get("max_distance", 10))
                 for i in cands[a]:
                     near = [x[j, b] for j in cands[b] if j != i and structural_distance(page, i, j) <= dmax]
-                    if near:
-                        solver.Add(x[i, a] <= sum(near))
-                    else:
-                        solver.Add(x[i, a] == 0)
+                    add_row(x[i, a], sum(near) if near else 0, soft)
             elif c.kind == "ordering":
                 before, after = p["before"], p["after"]
                 for i in cands[after]:
                     for j in cands[before]:
                         if i != j and page.position(i) < page.position(j):
-                            solver.Add(x[i, after] + x[j, before] <= 1)
+                            add_row(x[i, after] + x[j, before], 1, soft)
             # node-local kinds are already applied through the candidate sets
 
         obj = solver.Objective()
         for (i, f), v in x.items():
             obj.SetCoefficient(v, float(scores[i, fidx[f]]))
+        for z in slacks:
+            obj.SetCoefficient(z, -float(lam))
         obj.SetMaximization()
         status = solver.Solve()
         if status not in (pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE):
@@ -257,9 +280,13 @@ class ConstraintSolver:
             j = fidx[fs.name]
             chosen = [i for i in cands[fs.name] if x[i, fs.name].solution_value() > 0.5]
             out[fs.name] = _choice(page, scores, j, chosen[0] if chosen else None, cands[fs.name])
-        return Record(out, method="ilp",
-                      status="OPTIMAL" if status == pywraplp.Solver.OPTIMAL else "FEASIBLE",
-                      objective=float(obj.Value()), active=[c.name for c in active])
+        rec = Record(out, method="ilp" if lam is None else "ilp-soft",
+                     status="OPTIMAL" if status == pywraplp.Solver.OPTIMAL else "FEASIBLE",
+                     objective=float(obj.Value()), active=[c.name for c in active])
+        if slacks:
+            rec.active = rec.active + [f"soft_violations={int(sum(z.solution_value() > 0.5 for z in slacks))}",
+                                       f"lambda={lam}"]
+        return rec
 
 
 def values_to_record(page: Page, values: Dict[str, str], schema: Schema, method: str) -> Record:

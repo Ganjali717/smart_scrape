@@ -21,7 +21,7 @@ class Extractor:
         if list(bundle["fields"]) != schema.field_names:
             raise ValueError(f"model fields {bundle['fields']} != schema fields {schema.field_names}")
         self.model, self.schema = model, schema
-        self.encoder = FeatureEncoder(sentence_model=bundle.get("sentence_model"))
+        self.encoder = FeatureEncoder(sentence_model=bundle.get("sentence_model"), exclude=bundle.get("exclude_features", []))
         self.solver = ConstraintSolver(schema, top_k=top_k)
         self.risk_threshold = risk_threshold
 

@@ -91,7 +91,7 @@ def train_scorer(train: Sequence[Encoded], val: Sequence[Encoded], schema: Schem
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
             opt.step()
-            tot += float(loss)
+            tot += loss.item()
         score = _field_hit_rate(model, val, schema, device) if val else 0.0
         log(f"  epoch {ep:3d}  loss {tot / max(1, len(order)):.4f}  val field-hit {score:.3f}")
         if score > best + 1e-4:
@@ -151,6 +151,7 @@ def save_bundle(model: RGCNScorer, schema: Schema, model_cfg: dict, path: str) -
         "hidden": model.inp[0].out_features,
         "layers": len(model.convs),
         "sentence_model": (model_cfg or {}).get("sentence_model"),
+        "exclude_features": list((model_cfg or {}).get("exclude_features", [])),
     }, path)
 
 

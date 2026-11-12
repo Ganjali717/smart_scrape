@@ -14,7 +14,7 @@ seeds: [0, 1, 2]
 model: {hidden: 128, layers: 2, epochs: 30, lr: 0.002, pos_weight: 20, patience: 6}
 top_k: 20
 calibrate: {enabled: true, min_support: 0.95, quantile: 0.95}
-methods: [argmax, filtered, ilp]
+methods: [argmax, filtered, ilp, ilp-soft]
 baselines:
   xpath: {}
   # autoscraper: experimental - on SWDE's archived HTML its rules match the whole document

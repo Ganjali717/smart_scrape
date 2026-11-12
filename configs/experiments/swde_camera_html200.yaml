@@ -13,12 +13,14 @@ split: {type: cross_site, train_sites: 3, val_sites: 1}
 seeds: [0, 1, 2]
 model: {hidden: 128, layers: 2, epochs: 30, lr: 0.002, pos_weight: 20, patience: 6}
 top_k: 20
+soft_lambda_grid: [0.25, 0.5, 1, 2, 4, 8]
 calibrate: {enabled: true, min_support: 0.95, quantile: 0.95}
 methods:
   - argmax                           # GNN-only
   - filtered                         # node-local constraints only
   - ilp                              # full constraint set, calibrated on training sites
   - ilp-uncalibrated                 # same constraints with hand-set parameters
+  - ilp-soft                         # cross-field constraints soft, penalty tuned on validation sites
   - ilp-mutual_exclusion+format+exclude_regions            # ablation: no cross-field constraints
   - ilp-mutual_exclusion+format+exclude_regions+proximity  # ablation: + proximity
 drift:

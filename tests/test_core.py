@@ -201,3 +201,14 @@ def test_prepare_offline_html():
     out = prepare_offline_html(h)
     assert "<base" not in out and "a.css" not in out and "alert" not in out
     assert 'src=""' in out and "<p>ok</p>" in out
+
+
+def test_soft_constraints_trade_off():
+    p, s = page(), schema()
+    # the related-block price outscores the main one by 1.0; proximity to the title rejects it
+    sc = scores_for(p, {"product_title": {"Canon PowerShot S90": 2.0},
+                        "price": {"$99.00": 3.0, "$129.00": 2.0}})
+    assert ConstraintSolver(s).solve(p, sc).fields["price"].text == "$129.00"            # hard
+    assert ConstraintSolver(s, soft_lambda=5.0).solve(p, sc).fields["price"].text == "$129.00"   # penalty > gain
+    soft = ConstraintSolver(s, soft_lambda=0.5).solve(p, sc)                              # penalty < gain
+    assert soft.fields["price"].text == "$99.00" and any("soft_violations=1" in a for a in soft.active)
