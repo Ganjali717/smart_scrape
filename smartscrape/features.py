@@ -56,6 +56,8 @@ class FeatureEncoder:
         self._st = None
         self.device = device or ("cuda" if _cuda() else "cpu")
         self.exclude = set(exclude or [])
+        self._emb_cache = {}           # text -> embedding; drifted copies share almost all texts
+        self.max_cache = 2_000_000
         unknown = self.exclude - set(self.BLOCKS)
         if unknown:
             raise ValueError(f"unknown feature blocks {unknown}; known: {sorted(self.BLOCKS)}")
@@ -67,7 +69,8 @@ class FeatureEncoder:
 
     def _st_dim(self) -> int:
         self._load_st()
-        return self._st.get_sentence_embedding_dimension()
+        fn = getattr(self._st, "get_embedding_dimension", None) or self._st.get_sentence_embedding_dimension
+        return fn()
 
     def _load_st(self):
         if self._st is None and self.sentence_model_name:
@@ -92,10 +95,18 @@ class FeatureEncoder:
         }
         blocks = [makers[b]() for b in self.BLOCKS if b not in self.exclude]
         if self.sentence_model_name:
-            self._load_st()
-            blocks.append(self._st.encode(texts, batch_size=256, normalize_embeddings=True,
-                                          show_progress_bar=False))
+            blocks.append(self._embed(texts))
         return np.concatenate(blocks, axis=1).astype(np.float32)
+
+    def _embed(self, texts: List[str]) -> np.ndarray:
+        self._load_st()
+        missing = list({t for t in texts if t not in self._emb_cache})
+        if missing:
+            vecs = self._st.encode(missing, batch_size=512, normalize_embeddings=True, show_progress_bar=False)
+            if len(self._emb_cache) + len(missing) > self.max_cache:
+                self._emb_cache.clear()
+            self._emb_cache.update(zip(missing, np.asarray(vecs, dtype=np.float32)))
+        return np.stack([self._emb_cache[t] for t in texts]).astype(np.float32)
 
     @staticmethod
     def _tags(page: Page) -> np.ndarray:
