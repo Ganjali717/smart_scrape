@@ -1,0 +1,32 @@
+# In-site setting: every site contributes 20 training pages, the rest is test.
+# This is where per-site wrappers (XPath, AutoScraper) apply, so it is the fair
+# head-to-head against them. LLM baselines need no training and run here too.
+name: swde_camera_insite
+dataset:
+  type: swde
+  html_root: data/swde/html
+  gt_parquet: data/swde/camera-00000-of-00001.parquet
+  vertical: camera
+  max_pages_per_site: 200
+schema: configs/schemas/swde_camera.yaml
+split: {type: in_site, train_per_site: 20, val_per_site: 5}
+seeds: [0, 1, 2]
+model: {hidden: 128, layers: 2, epochs: 30, lr: 0.002, pos_weight: 20, patience: 6}
+top_k: 20
+calibrate: {enabled: true, min_support: 0.95, quantile: 0.95}
+methods: [argmax, filtered, ilp]
+baselines:
+  xpath: {}
+  # autoscraper: experimental - on SWDE's archived HTML its rules match the whole document
+  # autoscraper: {max_train_pages_per_site: 5}
+  # Local LLM through Ollama (ollama pull <model> first). Uncomment to run; ~seconds per page.
+  # llm_local: {type: llm, backend: ollama, model: "qwen2.5:14b-instruct", input: text, max_chars: 24000}
+  # API model: set the key in the environment and the prices you looked up (USD per 1M tokens + date).
+  # llm_api: {type: llm, backend: openai, model: "gpt-4o-mini", api_key_env: OPENAI_API_KEY,
+  #           price_in_per_mtok: null, price_out_per_mtok: null, price_date: null}
+  # scrapegraphai: {graph_config: {llm: {model: "ollama/qwen2.5:14b-instruct"}}}
+  # crawl4ai: {provider: "ollama/qwen2.5:14b-instruct"}
+drift:
+  - {name: all_combined, kinds: [wrapper_insertion, tag_rename, sibling_reorder, distractor_block], severity: 0.4}
+cache_dir: cache
+output: results/swde_camera_insite

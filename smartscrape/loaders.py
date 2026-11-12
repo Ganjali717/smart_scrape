@@ -148,7 +148,9 @@ def load_swde_vertical(html_root: str, gt_parquet: str, vertical: str,
             with open(fp, "rb") as fh:
                 raw = fh.read()
             text = raw.decode("utf-8", errors="replace")
-            pages.append(page_from_html(text, pid, site, gold))
+            pg = page_from_html(text, pid, site, gold)
+            pg.source = os.path.abspath(fp)
+            pages.append(pg)
     return pages
 
 

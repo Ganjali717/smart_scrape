@@ -262,6 +262,22 @@ class ConstraintSolver:
                       objective=float(obj.Value()), active=[c.name for c in active])
 
 
+def values_to_record(page: Page, values: Dict[str, str], schema: Schema, method: str) -> Record:
+    """Wrap a baseline's {field: value} output as a Record; each value is grounded to the first
+    node whose normalised text equals it (None when the value does not occur on the page)."""
+    from .data import normalize_text
+
+    index: Dict[str, int] = {}
+    for nd in page.nodes:
+        index.setdefault(normalize_text(nd.text), nd.id)
+    out = {}
+    for f in schema.field_names:
+        v = (values.get(f) or "").strip()
+        node = index.get(normalize_text(v)) if v else None
+        out[f] = FieldChoice(node, v, 0.0)
+    return Record(out, method=method, status="BASELINE")
+
+
 # ---------------------------------------------------------------------------
 # Constraint checking on any record (used to count violations for every method)
 # ---------------------------------------------------------------------------
@@ -269,7 +285,7 @@ def violations(page: Page, record: Record, schema: Schema) -> List[str]:
     v: List[str] = []
     chosen = record.nodes()
     for fs in schema.fields:
-        if fs.cardinality == "one" and chosen.get(fs.name) is None:
+        if fs.cardinality == "one" and not record.fields[fs.name].text:
             v.append(f"cardinality({fs.name})")
     for c in schema.constraints:
         p = c.params

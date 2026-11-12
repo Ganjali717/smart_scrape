@@ -1,0 +1,28 @@
+# FitLayout-rendered SWDE camera: geometry, fonts and spatial edges available
+# Cross-site experiment on SWDE camera. Download once:
+#   huggingface.co/datasets/abdo-Mansour/SWDE  files/camera.7z  data/camera-00000-of-00001.parquet
+name: swde_camera_rendered200
+dataset:
+  type: jsonl
+  path: data/render/camera/pages.jsonl   # produced by: python scripts/render_swde.py camera --max-pages-per-site 200
+schema: configs/schemas/swde_camera_rendered.yaml
+split: {type: cross_site, train_sites: 3, val_sites: 1}
+seeds: [0, 1, 2]
+model: {hidden: 128, layers: 2, epochs: 30, lr: 0.002, pos_weight: 20, patience: 6}
+top_k: 20
+calibrate: {enabled: true, min_support: 0.95, quantile: 0.95}
+methods:
+  - argmax                           # GNN-only
+  - filtered                         # node-local constraints only
+  - ilp                              # full constraint set, calibrated on training sites
+  - ilp-uncalibrated                 # same constraints with hand-set parameters
+  - ilp-mutual_exclusion+format+exclude_regions            # ablation: no cross-field constraints
+  - ilp-mutual_exclusion+format+exclude_regions+proximity  # ablation: + proximity
+drift:
+  - {name: wrapper_insertion, kinds: [wrapper_insertion], severity: 0.5}
+  - {name: tag_rename,        kinds: [tag_rename],        severity: 0.5}
+  - {name: sibling_reorder,   kinds: [sibling_reorder],   severity: 0.5}
+  - {name: distractor_block,  kinds: [distractor_block],  severity: 0.6}
+  - {name: all_combined,      kinds: [wrapper_insertion, tag_rename, sibling_reorder, distractor_block], severity: 0.4}
+cache_dir: cache
+output: results/swde_camera_rendered200

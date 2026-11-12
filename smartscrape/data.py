@@ -48,6 +48,7 @@ class Page:
     labels: Dict[int, str] = field(default_factory=dict)
     url: str = ""
     snapshot: str = ""           # e.g. Wayback timestamp for drift benchmarks
+    source: str = ""             # path of the raw HTML file, used by selector/LLM baselines
 
     @property
     def n(self) -> int:
@@ -81,7 +82,7 @@ class Page:
             page_id=d["page_id"], site=d["site"], nodes=nodes,
             gold=d.get("gold", {}),
             labels={int(k): v for k, v in d.get("labels", {}).items()},
-            url=d.get("url", ""), snapshot=d.get("snapshot", ""),
+            url=d.get("url", ""), snapshot=d.get("snapshot", ""), source=d.get("source", ""),
         )
 
 

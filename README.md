@@ -23,7 +23,7 @@ page (raw HTML or FitLayout render)
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install torch --index-url https://download.pytorch.org/whl/cu128   # pick the CUDA build for your GPU
 pip install -r requirements.txt
-pytest -q tests/                                         # 14 tests, < 1 s
+pytest -q tests/                                         # 21 tests
 ```
 
 ## Run an experiment
@@ -60,6 +60,65 @@ Outputs in `results/<name>/`:
 Applied to the **input page**, never to model outputs: `wrapper_insertion`,
 `tag_rename`, `sibling_reorder`, `distractor_block` (look-alike "related
 products" block, half of the time without any region hint), and combinations.
+
+## Render with FitLayout (visual features)
+
+SWDE ships HTML only, so the main SWDE run uses DOM structure and reading
+order. To add real geometry, fonts and spatial edges, render the pages with
+FitLayout's docker CLI (puppeteer backend):
+
+```bash
+docker pull fitlayout/fitlayout-cli                                   # Docker Desktop must be running
+python scripts/render_swde.py camera --sites newegg --max-pages-per-site 3      # smoke test: 3 pages
+python scripts/render_swde.py camera --max-pages-per-site 200 --threads 6       # ~2,000 pages
+python -m smartscrape run configs/experiments/swde_camera_rendered200.yaml      # rendered
+python -m smartscrape run configs/experiments/swde_camera_html200.yaml          # same pages, HTML only
+```
+
+The script copies each page with offline fixes (no `<base>`, scripts or
+external CSS/images, which no longer exist for 2011 pages), serves them on
+`http://host.docker.internal:8765/` from the Python process, runs
+`fitlayout-cli BATCH`, and parses the exported XML box trees into
+`data/render/camera/pages.jsonl`. Re-running skips rendered pages. On first
+run Windows may ask to allow Python through the firewall: allow it on
+private networks so the container can reach the server.
+
+The two `*200` configs share pages, splits and schema, so the difference
+between them is exactly what rendering adds.
+
+## Baselines (external tools, same data, same metrics)
+
+`smartscrape/baselines/` wraps external extractors behind one interface
+(`fit(train_pages)`, `extract(page) -> {field: value}`). Baselines read the
+page's raw HTML, never SmartScrape's parsed nodes, and are scored by the same
+`evaluate.py`, including the violation rate and `grounded_rate` (share of
+predicted values that occur verbatim on the page, i.e. no hallucination).
+
+| Name | Tool | Needs pages of the test site |
+|---|---|---|
+| `xpath` | induced per-site XPath wrapper (lxml), with the usual index-free fallback | yes |
+| `autoscraper` | AutoScraper, rules learned from example values (experimental: fails on SWDE's archived HTML) | yes |
+| `llm` | our transparent LLM extractor: `ollama` (local), `openai` (any compatible endpoint), `anthropic` | no |
+| `scrapegraphai` | ScrapeGraphAI `SmartScraperGraph` (thin adapter, not yet run end-to-end) | no |
+| `crawl4ai` | Crawl4AI `LLMExtractionStrategy` (thin adapter, not yet run end-to-end) | no |
+
+Per-site wrappers only make sense when they may see the test site, so they run
+in the `in_site` split (`configs/experiments/swde_camera_insite.yaml`) and in
+temporal drift experiments; in `cross_site` they are skipped with a log line.
+Synthetic drift changes the parsed page, not the HTML file, so baselines are
+not run on synthetic drift settings. LLM cost is computed only from the prices
+you put in the config, with the date you looked them up.
+
+## Efficiency benchmark (E7)
+
+```bash
+python -m smartscrape bench --model results/swde_camera_insite/model_seed0.pt \
+    --schema results/swde_camera_insite/schema_calibrated_seed0.yaml \
+    --pages cache/pages_swde_<hash>.jsonl --sizes 100 1000 10000 --out results/bench.csv
+```
+
+Per page and per stage (features+graph, GNN, ILP): mean and p50/p95 latency,
+pages/second, peak RSS, peak VRAM, and the correlation of latency with page size.
 
 ## Extract from a page
 

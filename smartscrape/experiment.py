@@ -43,7 +43,7 @@ from .train import encode_pages, save_bundle, score_pages, train_scorer
 # Data
 # ---------------------------------------------------------------------------
 def load_dataset(cfg: dict, cache_dir: str, log=print) -> List[Page]:
-    key = hashlib.md5(json.dumps(cfg, sort_keys=True).encode()).hexdigest()[:10]
+    key = hashlib.md5(json.dumps({**cfg, "_cache_version": 2}, sort_keys=True).encode()).hexdigest()[:10]
     path = os.path.join(cache_dir, f"pages_{cfg['type']}_{key}.jsonl")
     if os.path.exists(path):
         log(f"[data] cached pages: {path}")
@@ -86,6 +86,19 @@ def split_sites(pages: Sequence[Page], split: dict, seed: int):
         tr, va, te = set(sites[:k]), set(sites[k:k + v]), set(sites[k + v:])
         return ([p for p in pages if p.site in tr], [p for p in pages if p.site in va],
                 [p for p in pages if p.site in te])
+    if split["type"] == "in_site":
+        # every site contributes its first pages to training/validation and the rest to test;
+        # this is the setting where per-site wrappers (XPath, AutoScraper) are applicable
+        k, v = split.get("train_per_site", 20), split.get("val_per_site", 5)
+        by_site = {}
+        for p in pages:
+            by_site.setdefault(p.site, []).append(p)
+        tr, va, te = [], [], []
+        for s in sorted(by_site):
+            ps = sorted(by_site[s], key=lambda p: p.page_id)
+            rng.shuffle(ps)
+            tr += ps[:k]; va += ps[k:k + v]; te += ps[k + v:]
+        return tr, va, te
     if split["type"] == "random":
         idx = list(range(len(pages)))
         rng.shuffle(idx)
@@ -122,6 +135,42 @@ def build_methods(schema: Schema, top_k: int, variants: Sequence[str], raw_schem
         else:
             raise ValueError(f"unknown method {v}")
     return methods
+
+
+def run_baseline(name: str, opts: dict, schema: Schema, train: Sequence[Page], test: Sequence[Page],
+                 split_type: str, seed: int, log=print) -> List[dict]:
+    from .baselines import BaselineUnavailable, make_baseline
+    from .solver import values_to_record
+
+    kind = opts.get("type", name)
+    try:
+        b = make_baseline(kind, schema, **{k: v for k, v in opts.items() if k != "type"})
+    except (KeyError, BaselineUnavailable) as e:
+        log(f"  [baseline] {name}: skipped ({e})")
+        return []
+    if b.needs_site_training and split_type == "cross_site":
+        log(f"  [baseline] {name}: skipped (needs pages of the test site; use split in_site or temporal)")
+        return []
+    pages = [p for p in test if p.source]
+    if len(pages) < len(test):
+        log(f"  [baseline] {name}: {len(test) - len(pages)} test pages have no raw HTML and are skipped")
+    try:
+        b.fit(train)
+        recs = [values_to_record(p, b.extract(p), schema, f"baseline:{name}") for p in pages]
+    except BaselineUnavailable as e:
+        log(f"  [baseline] {name}: unavailable ({e})")
+        return []
+    m = aggregate(pages, recs, schema)
+    st = b.stats.as_dict()
+    m.update({"ms_per_page": st["ms_per_page"], "fit_seconds": st["fit_seconds"],
+              "prompt_tokens": st["prompt_tokens"], "completion_tokens": st["completion_tokens"],
+              "failures": st["failures"]})
+    cost = getattr(b, "cost_usd", lambda: None)()
+    if cost is not None:
+        m["usd_per_1k_pages"] = 1000 * cost / max(1, len(pages))
+    log(f"  [{'clean':>18}] {'baseline:' + name:<28} F1 {m['f1/macro']:.3f}  EM {m['exact_match']:.3f}  "
+        f"viol {m['violation_rate']:.3f}  grounded {m['grounded_rate']:.3f}  {m['ms_per_page']:.0f} ms/page")
+    return [{"seed": seed, "setting": "clean", "method": f"baseline:{name}", **m}]
 
 
 def old_sigma(scores: np.ndarray) -> float:
@@ -199,6 +248,10 @@ def run(config_path: str, log=print) -> str:
             else:
                 test_pages = [apply_drift(p, d["kinds"], d.get("severity", 0.3), seed,
                                           pool_titles=title_pool.get(p.site)) for p in te]
+            if d is None:
+                for bname, bopts in (cfg.get("baselines") or {}).items():
+                    rows.extend(run_baseline(bname, bopts or {}, seed_schema, list(tr) + list(va), test_pages,
+                                             cfg["split"]["type"], seed, log))
             enc_te = encode_pages(test_pages, schema, encoder)
             scores = score_pages(model, enc_te)
             for mname, fn in methods.items():
@@ -241,9 +294,11 @@ def run(config_path: str, log=print) -> str:
 def _write_rows(path, rows):
     if not rows:
         return
-    keys = list(rows[0].keys())
+    keys = []
+    for r in rows:
+        keys += [k for k in r if k not in keys]
     with open(path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=keys)
+        w = csv.DictWriter(f, fieldnames=keys, restval="")
         w.writeheader()
         w.writerows(rows)
 
@@ -252,13 +307,15 @@ def _write_summary(path, rows):
     groups = defaultdict(list)
     for r in rows:
         groups[(r["setting"], r["method"])].append(r)
-    metrics = [k for k in rows[0] if k not in ("seed", "setting", "method")] if rows else []
+    metrics = []
+    for r in rows:
+        metrics += [k for k in r if k not in ("seed", "setting", "method") and k not in metrics]
     with open(path, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["setting", "method", "n_seeds"] + [f"{m}_{s}" for m in metrics for s in ("mean", "std")])
         for (s, m), rs in groups.items():
             vals = []
             for k in metrics:
-                a = np.array([r[k] for r in rs], dtype=float)
-                vals += [round(float(a.mean()), 4), round(float(a.std()), 4)]
+                a = np.array([r[k] for r in rs if k in r], dtype=float)
+                vals += ([round(float(a.mean()), 4), round(float(a.std()), 4)] if len(a) else ["", ""])
             w.writerow([s, m, len(rs)] + vals)

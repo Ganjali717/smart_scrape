@@ -17,7 +17,7 @@ def field_outcomes(page: Page, rec: Record, schema: Schema) -> Dict[str, str]:
     out = {}
     for f in schema.field_names:
         gold = page.gold.get(f) or []
-        pred = rec.fields[f].text if rec.fields[f].node is not None else ""
+        pred = rec.fields[f].text or ""
         if gold:
             if pred and text_matches(pred, gold):
                 out[f] = "tp"
@@ -37,7 +37,12 @@ def record_correct(outcomes: Dict[str, str]) -> bool:
 def aggregate(pages: Sequence[Page], records: Sequence[Record], schema: Schema) -> Dict[str, float]:
     counts = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
     exact = viol = 0
+    nonempty = grounded = 0
     for p, r in zip(pages, records):
+        for c in r.fields.values():
+            if c.text:
+                nonempty += 1
+                grounded += int(c.node is not None)
         oc = field_outcomes(p, r, schema)
         for f, o in oc.items():
             if o == "tp":
@@ -61,6 +66,7 @@ def aggregate(pages: Sequence[Page], records: Sequence[Record], schema: Schema) 
     res["f1/macro"] = float(np.mean(f1s)) if f1s else 0.0
     res["exact_match"] = exact / n
     res["violation_rate"] = viol / n
+    res["grounded_rate"] = grounded / max(1, nonempty)   # predicted values that occur verbatim on the page
     res["pages"] = float(len(pages))
     return res
 

@@ -1,0 +1,15 @@
+# SWDE camera on FitLayout-rendered pages: adds geometric constraints that need real boxes.
+# All non-definitional constraints are checked by calibration on the training sites.
+name: swde_camera_rendered
+fields:
+  product_title: {type: text, cardinality: one}
+  price:         {type: price, cardinality: one}
+  manufacturer:  {type: text, cardinality: optional}
+constraints:
+  - {kind: mutual_exclusion, rank: 10}
+  - {kind: format, field: price, rank: 8}
+  - {kind: exclude_regions, regions: [footer, nav], fields: all, rank: 3}
+  - {kind: position_band, field: product_title, max: 0.5, rank: 2}   # title in the upper half of the page
+  - {kind: position_band, field: price, max: 0.6, rank: 2}
+  - {kind: proximity, a: price, b: product_title, max_distance: 14, rank: 2}
+  - {kind: ordering, before: product_title, after: price, rank: 1}

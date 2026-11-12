@@ -153,3 +153,51 @@ def test_schema_roundtrip(tmp_path):
     s2 = Schema.load(str(path))
     assert s2.field_names == s.field_names
     assert [c.name for c in s2.constraints] == [c.name for c in s.constraints]
+
+
+# --- FitLayout XML ---------------------------------------------------------
+FL_XML = """<?xml version="1.0"?>
+<page>
+<box tagName="body" positionX="0" positionY="0" width="1200" height="1600" contentX="0" contentY="0" contentWidth="1200" contentHeight="1600" visualX="0" visualY="0" visualWidth="1200" visualHeight="1600" color="#000000" bgcolor="#ffffff" fontfamily="Arial" fontsize="16.0" fontweight="0.4" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">
+    <box tagName="nav" positionX="0" positionY="0" width="1200" height="40" contentX="0" contentY="0" contentWidth="1200" contentHeight="40" visualX="0" visualY="0" visualWidth="1200" visualHeight="40" color="#000000" bgcolor="#eeeeee" fontfamily="Arial" fontsize="14.0" fontweight="0.4" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">
+        <box tagName="#text" positionX="10" positionY="10" width="60" height="20" contentX="10" contentY="10" contentWidth="60" contentHeight="20" visualX="10" visualY="10" visualWidth="60" visualHeight="20" color="#000000" bgcolor="" fontfamily="Arial" fontsize="14.0" fontweight="0.4" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">Home</box>
+    </box>
+    <box tagName="h1" positionX="20" positionY="80" width="600" height="40" contentX="20" contentY="80" contentWidth="600" contentHeight="40" visualX="20" visualY="80" visualWidth="600" visualHeight="40" color="#000000" bgcolor="" fontfamily="Arial" fontsize="32.0" fontweight="0.7" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">
+        <box tagName="#text" positionX="20" positionY="80" width="400" height="40" contentX="20" contentY="80" contentWidth="400" contentHeight="40" visualX="20" visualY="80" visualWidth="400" visualHeight="40" color="#000000" bgcolor="" fontfamily="Arial" fontsize="32.0" fontweight="0.7" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">Canon PowerShot S90</box>
+    </box>
+    <box tagName="span" positionX="20" positionY="140" width="100" height="24" contentX="20" contentY="140" contentWidth="100" contentHeight="24" visualX="20" visualY="140" visualWidth="100" visualHeight="24" color="#cc0000" bgcolor="" fontfamily="Arial" fontsize="20.0" fontweight="0.7" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">
+        <box tagName="#text" positionX="20" positionY="140" width="80" height="24" contentX="20" contentY="140" contentWidth="80" contentHeight="24" visualX="20" visualY="140" visualWidth="80" visualHeight="24" color="#cc0000" bgcolor="" fontfamily="Arial" fontsize="20.0" fontweight="0.7" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">$129.00</box>
+    </box>
+    <box tagName="footer" positionX="0" positionY="1500" width="1200" height="100" contentX="0" contentY="1500" contentWidth="1200" contentHeight="100" visualX="0" visualY="1500" visualWidth="1200" visualHeight="100" color="#000000" bgcolor="" fontfamily="Arial" fontsize="12.0" fontweight="0.4" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">
+        <box tagName="#text" positionX="10" positionY="1510" width="200" height="16" contentX="10" contentY="1510" contentWidth="200" contentHeight="16" visualX="10" visualY="1510" visualWidth="200" visualHeight="16" color="#000000" bgcolor="" fontfamily="Arial" fontsize="12.0" fontweight="0.4" fontstyle="0.0" underline="0.0" linethrough="0.0" replaced="false">Terms &amp;amp;gt; Privacy</box>
+    </box>
+</box>
+</page>"""
+
+
+def test_parse_fitlayout_xml():
+    from smartscrape.render import parse_fitlayout_xml
+    from smartscrape.features import FeatureEncoder
+    from smartscrape.graph import build_edges
+    p = parse_fitlayout_xml(FL_XML, "fl0", "site", dict(GOLD))
+    texts = [n.text for n in p.nodes]
+    assert texts[:3] == ["Home", "Canon PowerShot S90", "$129.00"]
+    assert p.has_geometry()
+    title = p.nodes[1]
+    assert title.tag == "h1" and title.bbox == [20.0, 80.0, 400.0, 40.0] and title.font_size == 32.0
+    assert "nav" in p.nodes[0].regions and "footer" in p.nodes[3].regions
+    assert p.labels[1] == "product_title" and p.labels[2] == "price"
+    assert p.position(3) > 0.9
+    x = FeatureEncoder().encode(p)
+    assert x.shape[0] == p.n and x[:, -6].sum() == p.n      # geometry flag set for every node
+    ei, et = build_edges(p)
+    assert 3 in set(et.tolist())                             # spatial kNN edges exist
+
+
+def test_prepare_offline_html():
+    from smartscrape.render import prepare_offline_html
+    h = ('<base href="http://x.com/"><link rel="stylesheet" href="http://x.com/a.css">'
+         '<script>alert(1)</script><img src="http://x.com/i.png" width="10"><p>ok</p>')
+    out = prepare_offline_html(h)
+    assert "<base" not in out and "a.css" not in out and "alert" not in out
+    assert 'src=""' in out and "<p>ok</p>" in out

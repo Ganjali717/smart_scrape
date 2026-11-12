@@ -2,6 +2,7 @@
 Command line:
 
   python -m smartscrape run      configs/experiments/<exp>.yaml
+  python -m smartscrape bench    --model ... --schema ... --pages cache/pages_*.jsonl --sizes 100 1000 10000
   python -m smartscrape extract  --model results/<exp>/model_seed0.pt --schema configs/schemas/<s>.yaml \
                                  (--html page.html | --url https://...)  [--json out.json]
 """
@@ -25,7 +26,19 @@ def main(argv=None):
     g.add_argument("--html", help="local HTML file (parsed without rendering)")
     g.add_argument("--url", help="URL rendered through FitLayout (needs FITLAYOUT_TOKEN)")
     e.add_argument("--json", help="write the record with provenance to this file")
+    b = sub.add_parser("bench", help="latency / throughput / memory benchmark (E7)")
+    b.add_argument("--model", required=True)
+    b.add_argument("--schema", required=True)
+    b.add_argument("--pages", required=True, help="pages .jsonl (e.g. from cache/)")
+    b.add_argument("--sizes", type=int, nargs="+", default=[100, 1000])
+    b.add_argument("--out", default="results/bench.csv")
+    b.add_argument("--device", default=None)
     a = ap.parse_args(argv)
+
+    if a.cmd == "bench":
+        from .bench import run_bench
+        run_bench(a.model, a.schema, a.pages, a.sizes, a.out, device=a.device)
+        return 0
 
     if a.cmd == "run":
         from .experiment import run

@@ -32,7 +32,7 @@ def _rebuild(page: Page, nodes: List[Node], id_map: Dict[int, int]) -> Page:
     for nd in nodes:
         nd.parent = id_map.get(nd.parent, -1) if nd.parent >= 0 else -1
     labels = {id_map[i]: f for i, f in page.labels.items() if i in id_map}
-    return Page(page.page_id, page.site, nodes, dict(page.gold), labels, page.url, page.snapshot)
+    return Page(page.page_id, page.site, nodes, dict(page.gold), labels, page.url, page.snapshot, page.source)
 
 
 def wrapper_insertion(page: Page, severity: float, rng: random.Random) -> Page:
@@ -133,4 +133,8 @@ def apply_drift(page: Page, kinds: Sequence[str], severity: float, seed: int,
     for k in kinds:
         fn = PERTURBATIONS[k]
         out = fn(out, severity, rng, pool_titles) if k == "distractor_block" else fn(out, severity, rng)
+    if out is page:
+        out = copy.copy(page)
+    # the raw HTML no longer matches the perturbed page: baselines that read HTML must not see it
+    out.source = ""
     return out
