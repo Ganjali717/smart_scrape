@@ -101,6 +101,30 @@ python scripts/make_tables.py results/swde_camera_semfeat results/swde_book_semf
 drift and reliability. `scripts/adaptive_gate.py` re-scores test sites with
 trained models to analyse, per site, when cross-field constraints help.
 
+## Template inference (label-free, per site)
+
+A page-level scorer that has never seen a site makes *systematic* mistakes on it. Every page of
+the site comes from one template, so `smartscrape.template.TemplateEM` infers, for each field, the
+latent template slot that best explains the scorer's output across all pages of the site
+(consistency-seeking log-likelihood, EM for template adherence, joint slot assignment), and
+rescores every page with the posterior. No labels from the site, no tuning; ten unlabelled pages
+per site are enough. Every decoder (filtered, ILP, soft ILP) runs unchanged on the new scores.
+
+Re-evaluate already trained runs (no retraining) with the `+em` variants, a site-level drift
+setting and graded reliability targets:
+
+    python scripts/reeval.py configs/experiments/swde_book_semfeat.yaml configs/experiments/swde_auto_semfeat.yaml configs/experiments/swde_job_semfeat.yaml configs/experiments/swde_camera_semfeat.yaml
+
+Writes `reeval_*.csv/json` next to the original results.
+
+## LLM comparison on identical pages
+
+    ollama pull qwen2.5:14b
+    python scripts/llm_run.py --model qwen2.5:14b --per-site 50
+
+Resumable; one JSON line per page with values, tokens and seconds, on the fixed sample in
+`configs/sample_100_per_site.json`.
+
 ## Baselines (external tools, same data, same metrics)
 
 `smartscrape/baselines/` wraps external extractors behind one interface

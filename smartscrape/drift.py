@@ -9,6 +9,12 @@ model outputs, unlike the ICWE prototype that blended probabilities.
   tag_rename          tags swapped for visually equivalent ones (span<->div, b->strong ...)
   sibling_reorder     reorder nodes that share a parent
   distractor_block    inject a "related products" block with look-alike field values
+
+Two levels:
+  level="page"  every decision is drawn independently per page (noise-like drift);
+  level="site"  every decision is a deterministic function of (site, seed, structural
+                slot), so the same edit hits the same template slot on every page of the
+                site, as a real redesign does (e.g. "wrap every div/span in two divs").
 """
 
 from __future__ import annotations
@@ -35,10 +41,15 @@ def _rebuild(page: Page, nodes: List[Node], id_map: Dict[int, int]) -> Page:
     return Page(page.page_id, page.site, nodes, dict(page.gold), labels, page.url, page.snapshot, page.source)
 
 
-def wrapper_insertion(page: Page, severity: float, rng: random.Random) -> Page:
+def _slot_rng(rng, keyed, kind: str, key: str) -> random.Random:
+    return keyed(kind, key) if keyed is not None else rng
+
+
+def wrapper_insertion(page: Page, severity: float, rng: random.Random, keyed=None) -> Page:
     p = copy.deepcopy(page)
     next_elem = 10_000_000 + rng.randrange(1_000_000)
     for nd in p.nodes:
+        rng = _slot_rng(rng, keyed, "wrap", f"{nd.xpath}|{nd.depth}") if keyed else rng
         if rng.random() < severity and nd.ancestors:
             extra = rng.randint(1, 3)
             pos = rng.randrange(len(nd.ancestors) + 1)
@@ -50,9 +61,10 @@ def wrapper_insertion(page: Page, severity: float, rng: random.Random) -> Page:
     return p
 
 
-def tag_rename(page: Page, severity: float, rng: random.Random) -> Page:
+def tag_rename(page: Page, severity: float, rng: random.Random, keyed=None) -> Page:
     p = copy.deepcopy(page)
     for nd in p.nodes:
+        rng = _slot_rng(rng, keyed, "tag", f"{nd.xpath}|{nd.depth}") if keyed else rng
         if rng.random() < severity and nd.tag in _TAG_SWAP:
             new = _TAG_SWAP[nd.tag]
             nd.xpath = nd.xpath.rsplit("/", 1)[0] + "/" + new if "/" in nd.xpath else new
@@ -60,13 +72,16 @@ def tag_rename(page: Page, severity: float, rng: random.Random) -> Page:
     return p
 
 
-def sibling_reorder(page: Page, severity: float, rng: random.Random) -> Page:
+def sibling_reorder(page: Page, severity: float, rng: random.Random, keyed=None) -> Page:
     p = copy.deepcopy(page)
     groups: Dict[int, List[int]] = {}
     for nd in p.nodes:
         groups.setdefault(nd.parent, []).append(nd.id)
     new_order = list(range(p.n))
     for parent, ids in groups.items():
+        if keyed is not None:
+            first = p.nodes[ids[0]]
+            rng = keyed("reorder", f"{first.xpath}|{first.depth}|{len(ids)}")
         if len(ids) > 1 and rng.random() < severity:
             shuffled = ids[:]
             rng.shuffle(shuffled)
@@ -78,7 +93,7 @@ def sibling_reorder(page: Page, severity: float, rng: random.Random) -> Page:
 
 
 def distractor_block(page: Page, severity: float, rng: random.Random,
-                     pool_titles: Optional[Sequence[str]] = None) -> Page:
+                     pool_titles: Optional[Sequence[str]] = None, keyed=None) -> Page:
     """
     Insert a block of look-alike items (title + price pairs). With probability 0.5 the
     block carries no region hint (class names changed in the redesign), so region
@@ -92,8 +107,14 @@ def distractor_block(page: Page, severity: float, rng: random.Random,
     labeled = sorted(p.labels)
     anchor = labeled[-1] if labeled else p.n // 2
     # place the block either just after the record or early on the page
-    insert_at = min(p.n, anchor + 1 + rng.randint(0, 10)) if rng.random() < 0.7 else rng.randint(0, max(0, anchor))
-    flagged = rng.random() < 0.5
+    if keyed is None:   # page level: unchanged from the original protocol (reproducibility)
+        insert_at = (min(p.n, anchor + 1 + rng.randint(0, 10)) if rng.random() < 0.7
+                     else rng.randint(0, max(0, anchor)))
+        flagged = rng.random() < 0.5
+    else:               # site level: one layout decision for the whole site
+        lay = keyed("distractor", "layout")
+        after, offset, flagged = lay.random() < 0.7, lay.randint(0, 10), lay.random() < 0.5
+        insert_at = min(p.n, anchor + 1 + offset) if after else min(anchor, offset)
     base_anc = list(p.nodes[min(insert_at, p.n - 1)].ancestors[:-1]) if p.nodes[min(insert_at, p.n - 1)].ancestors else []
     block_elem = 20_000_000 + rng.randrange(1_000_000)
     new_nodes: List[Node] = []
@@ -127,12 +148,19 @@ PERTURBATIONS: Dict[str, Callable] = {
 
 
 def apply_drift(page: Page, kinds: Sequence[str], severity: float, seed: int,
-                pool_titles: Optional[Sequence[str]] = None) -> Page:
+                pool_titles: Optional[Sequence[str]] = None, level: str = "page") -> Page:
     rng = random.Random(f"{page.page_id}:{seed}")
+    keyed = None
+    if level == "site":
+        def keyed(kind: str, key: str, _site=page.site, _seed=seed) -> random.Random:
+            return random.Random(f"{_site}:{_seed}:{kind}:{key}")
+    elif level != "page":
+        raise ValueError(f"unknown drift level {level}")
     out = page
     for k in kinds:
         fn = PERTURBATIONS[k]
-        out = fn(out, severity, rng, pool_titles) if k == "distractor_block" else fn(out, severity, rng)
+        out = (fn(out, severity, rng, pool_titles, keyed=keyed) if k == "distractor_block"
+               else fn(out, severity, rng, keyed=keyed))
     if out is page:
         out = copy.copy(page)
     # the raw HTML no longer matches the perturbed page: baselines that read HTML must not see it

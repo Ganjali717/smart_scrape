@@ -231,3 +231,48 @@ def test_calibration_drops_format_that_rejects_gold():
     assign_labels(p)
     cal, rep = calibrate(schema(), [p])
     assert not any(c.kind == "format" for c in cal.constraints)
+
+
+def test_consensus_fixes_minority_errors_from_site_template():
+    from smartscrape.consensus import consensus_decode
+    sch = schema([{"kind": "mutual_exclusion", "rank": 10}])
+    pages, scores = [], []
+    for k in range(6):
+        html = (f"<html><body><div><h1>Camera model {k}</h1><b>Price:</b><span>${100 + k}.00</span></div>"
+                f"<div><b>Related</b><span>${50 + 7 * k}.99</span></div></body></html>")
+        p = page_from_html(html, f"p{k}", "site", {"product_title": [f"Camera model {k}"],
+                                                     "price": [f"${100 + k}.00"]})
+        s = np.full((p.n, 3), -5.0)
+        s[idx(p, f"Camera model {k}"), 0] = 2.0
+        right, wrong = idx(p, f"${100 + k}.00"), idx(p, f"${50 + 7 * k}.99")
+        s[right, 1] = 1.0
+        s[wrong, 1] = 1.5 if k < 2 else 0.5      # the model is wrong on two of six pages
+        pages.append(p); scores.append(s)
+    dec = lambda p, s: decode_filtered(p, s, sch)
+    base = [dec(p, s) for p, s in zip(pages, scores)]
+    assert aggregate(pages, base, sch)["f1/price"] < 0.7
+    recs, cons, keys = consensus_decode(pages, scores, dec, sch, beta=4.0)
+    assert aggregate(pages, recs, sch)["f1/price"] == 1.0
+    assert all(cons["site"].agreement(r, k) == 1.0 for r, k in zip(recs, keys))
+
+
+def test_template_em_prefers_consistent_slot_and_joint_assignment():
+    from smartscrape.template import TemplateEM
+    sch = schema([{"kind": "mutual_exclusion", "rank": 10}])
+    pages, scores = [], []
+    for k in range(8):
+        html = (f"<html><body><div><h1>Camera model {k}</h1><b>Price:</b><span>${100 + k}.00</span></div>"
+                f"<div><b>Related</b><span>${50 + 7 * k}.99</span></div></body></html>")
+        p = page_from_html(html, f"p{k}", "site", {"product_title": [f"Camera model {k}"],
+                                                     "price": [f"${100 + k}.00"]})
+        s = np.full((p.n, 3), -5.0)
+        s[idx(p, f"Camera model {k}"), 0] = 2.0
+        s[idx(p, f"${100 + k}.00"), 1] = 1.0                      # moderately liked on every page
+        s[idx(p, f"${50 + 7 * k}.99"), 1] = 3.0 if k < 3 else -4.0  # loved on three pages only
+        pages.append(p); scores.append(s)
+    dec = lambda p, s: decode_filtered(p, s, sch)
+    assert aggregate(pages, [dec(p, s) for p, s in zip(pages, scores)], sch)["f1/price"] < 0.8
+    new, tpls, keys = TemplateEM(sch, u=0.05).rescore(pages, scores)
+    assert aggregate(pages, [dec(p, s) for p, s in zip(pages, new)], sch)["f1/price"] == 1.0
+    t = tpls["site"].fields
+    assert t["price"].slot != t["product_title"].slot and t["price"].pi > 0.5

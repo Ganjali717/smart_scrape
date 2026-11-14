@@ -25,6 +25,7 @@ src/learning/active_learning_queries.json
 
 # v2 artefacts
 cache/
+oldresults/
 results/
 data/swde/
 *.pt
