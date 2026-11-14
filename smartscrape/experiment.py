@@ -47,7 +47,7 @@ def load_dataset(cfg: dict, cache_dir: str, log=print) -> List[Page]:
     path = os.path.join(cache_dir, f"pages_{cfg['type']}_{key}.jsonl")
     if os.path.exists(path):
         log(f"[data] cached pages: {path}")
-        return load_pages(path)
+        return _sanitize(load_pages(path))
     t0 = time.time()
     if cfg["type"] == "swde":
         from .loaders import load_swde_vertical
@@ -65,6 +65,15 @@ def load_dataset(cfg: dict, cache_dir: str, log=print) -> List[Page]:
     os.makedirs(cache_dir, exist_ok=True)
     save_pages(pages, path)
     log(f"[data] parsed {len(pages)} pages in {time.time() - t0:.1f}s -> {path}")
+    return pages
+
+
+def _sanitize(pages: List[Page]) -> List[Page]:
+    """Drop SWDE '<NULL>' gold values from pages cached before the loader filtered them."""
+    for p in pages:
+        clean = {f: [v for v in vals if v.strip() and v.strip().upper() != "<NULL>"] for f, vals in p.gold.items()}
+        p.gold = {f: v for f, v in clean.items() if v}
+        p.labels = {i: f for i, f in p.labels.items() if f in p.gold}
     return pages
 
 

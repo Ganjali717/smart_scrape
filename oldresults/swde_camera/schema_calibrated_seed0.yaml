@@ -1,0 +1,32 @@
+name: swde_camera
+fields:
+  product_title:
+    type: text
+    cardinality: one
+  price:
+    type: price
+    cardinality: one
+  manufacturer:
+    type: text
+    cardinality: optional
+constraints:
+- kind: mutual_exclusion
+  rank: 10
+- kind: format
+  rank: 8
+  field: price
+- kind: exclude_regions
+  rank: 3
+  regions:
+  - footer
+  - nav
+  fields: all
+- kind: proximity
+  rank: 2
+  a: price
+  b: product_title
+  max_distance: 25.0
+- kind: ordering
+  rank: 1
+  before: product_title
+  after: price

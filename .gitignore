@@ -26,7 +26,6 @@ src/learning/active_learning_queries.json
 # v2 artefacts
 cache/
 results/
-oldresults/
 data/swde/
 *.pt
 .pytest_cache/

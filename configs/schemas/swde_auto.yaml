@@ -1,0 +1,13 @@
+name: swde_auto
+fields:
+  model:        {type: text, cardinality: one}
+  price:        {type: price, cardinality: optional}
+  engine:       {type: text, cardinality: optional}
+  fuel_economy: {type: text, cardinality: optional}
+constraints:
+  - {kind: mutual_exclusion, rank: 10}
+  - {kind: format, field: price, rank: 8}
+  - {kind: exclude_regions, regions: [footer, nav], fields: all, rank: 3}
+  - {kind: proximity, a: price, b: model, max_distance: 14, rank: 2}
+  - {kind: proximity, a: engine, b: model, max_distance: 20, rank: 2}
+  - {kind: ordering, before: model, after: price, rank: 1}

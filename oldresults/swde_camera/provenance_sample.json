@@ -1,0 +1,427 @@
+[
+  {
+    "page": "amazon_0000",
+    "gold": {
+      "price": [
+        "$129.00"
+      ],
+      "manufacturer": [
+        "Canon",
+        ": Canon"
+      ],
+      "product_title": [
+        "Canon PowerShot SD1300 IS 12.1 MP Digital Camera with 4x Wide Angle Optical Image Stabilized Zoom and 2.7-Inch LCD (Silver)"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 7.704955577850342,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 128,
+        "text": "1 star",
+        "score": -0.8845,
+        "competitors": [
+          [
+            134,
+            -1.1553
+          ],
+          [
+            107,
+            -1.2879
+          ],
+          [
+            122,
+            -1.4702
+          ]
+        ]
+      },
+      "price": {
+        "node": 134,
+        "text": "$179.99",
+        "score": 3.7544,
+        "competitors": [
+          [
+            151,
+            1.7564
+          ],
+          [
+            136,
+            1.5348
+          ],
+          [
+            148,
+            0.5521
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 122,
+        "text": "3 star",
+        "score": 4.835,
+        "competitors": [
+          [
+            128,
+            3.9349
+          ],
+          [
+            207,
+            3.2459
+          ],
+          [
+            190,
+            2.5149
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0001",
+    "gold": {
+      "price": [
+        "$369.00"
+      ],
+      "manufacturer": [
+        "Canon",
+        ": Canon"
+      ],
+      "product_title": [
+        "Canon PowerShot S95 10 MP Digital Camera with 3.8x Wide Angle Optical Image Stabilized Zoom and 3.0-Inch inch LCD"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 6.659942388534546,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 116,
+        "text": "4 star",
+        "score": -0.2881,
+        "competitors": [
+          [
+            131,
+            -0.8803
+          ],
+          [
+            198,
+            -1.1996
+          ],
+          [
+            122,
+            -1.6172
+          ]
+        ]
+      },
+      "price": {
+        "node": 131,
+        "text": "$399.00",
+        "score": 3.678,
+        "competitors": [
+          [
+            160,
+            0.4672
+          ],
+          [
+            133,
+            0.1565
+          ],
+          [
+            157,
+            -0.8696
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 184,
+        "text": ": Canon",
+        "score": 3.2699,
+        "competitors": [
+          [
+            169,
+            2.5374
+          ],
+          [
+            122,
+            1.675
+          ],
+          [
+            116,
+            1.4379
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0002",
+    "gold": {
+      "price": [
+        "$151.95"
+      ],
+      "manufacturer": [
+        "Fuji",
+        ": Fuji"
+      ],
+      "product_title": [
+        "Fujifilm FinePix S1800 12.2 MP Digital Camera with 18x Wide Angle Optical Dual Image Stabilized Zoom and 3-Inch LCD"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 9.224458456039429,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 108,
+        "text": "4 star",
+        "score": -0.1282,
+        "competitors": [
+          [
+            114,
+            -0.7583
+          ],
+          [
+            123,
+            -0.8302
+          ],
+          [
+            177,
+            -1.0147
+          ]
+        ]
+      },
+      "price": {
+        "node": 123,
+        "text": "$229.95",
+        "score": 3.6337,
+        "competitors": [
+          [
+            125,
+            1.9204
+          ],
+          [
+            80,
+            -2.4734
+          ],
+          [
+            79,
+            -3.5758
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 114,
+        "text": "2 star",
+        "score": 5.719,
+        "competitors": [
+          [
+            161,
+            2.2925
+          ],
+          [
+            117,
+            1.7802
+          ],
+          [
+            129,
+            0.7552
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0003",
+    "gold": {
+      "price": [
+        "$129.00"
+      ],
+      "manufacturer": [
+        "Canon",
+        ": Canon"
+      ],
+      "product_title": [
+        "Canon PowerShot SD1300IS 12.1 MP Digital Camera with 4x Wide Angle Optical Image Stabilized Zoom and 2.7-Inch LCD (Blue)"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 7.712159633636475,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 126,
+        "text": "1 star",
+        "score": -0.8792,
+        "competitors": [
+          [
+            249,
+            3.5347
+          ],
+          [
+            105,
+            -0.9603
+          ],
+          [
+            132,
+            -1.1541
+          ]
+        ]
+      },
+      "price": {
+        "node": 132,
+        "text": "$179.99",
+        "score": 3.7555,
+        "competitors": [
+          [
+            134,
+            1.5364
+          ],
+          [
+            149,
+            1.4152
+          ],
+          [
+            146,
+            -0.5896
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 120,
+        "text": "3 star",
+        "score": 4.8359,
+        "competitors": [
+          [
+            126,
+            3.9379
+          ],
+          [
+            205,
+            3.2599
+          ],
+          [
+            188,
+            2.5157
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0004",
+    "gold": {
+      "price": [
+        "$179.00"
+      ],
+      "manufacturer": [
+        "Canon",
+        ": Canon"
+      ],
+      "product_title": [
+        "Canon PowerShot SX130IS 12.1 MP Digital Camera with 12x Wide Angle Optical Image Stabilized Zoom with 3.0-Inch LCD"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 6.117710590362549,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 113,
+        "text": "4 star",
+        "score": -1.0966,
+        "competitors": [
+          [
+            128,
+            -0.5236
+          ],
+          [
+            119,
+            -2.5747
+          ],
+          [
+            186,
+            -2.6661
+          ]
+        ]
+      },
+      "price": {
+        "node": 128,
+        "text": "$249.00",
+        "score": 3.905,
+        "competitors": [
+          [
+            162,
+            1.0575
+          ],
+          [
+            130,
+            0.9811
+          ],
+          [
+            156,
+            0.848
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 186,
+        "text": ": Canon",
+        "score": 3.3094,
+        "competitors": [
+          [
+            171,
+            2.5329
+          ],
+          [
+            116,
+            1.2261
+          ],
+          [
+            113,
+            1.1486
+          ]
+        ]
+      }
+    }
+  }
+]

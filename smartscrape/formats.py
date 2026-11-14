@@ -14,6 +14,7 @@ DATE_RE = re.compile(
     r"((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}(,\s*\d{2,4})?)|"
     r"(\d{1,2}\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{2,4})|"
     r"(\b(19|20)\d{2}\b)", re.I)
+ISBN_PREFIX_RE = re.compile(r"^\s*ISBN(?:-1[03])?\s*:?\s*", re.I)
 URL_RE = re.compile(r"^(https?://|www\.)\S+$", re.I)
 
 
@@ -44,6 +45,10 @@ def matches_type(text: str, ftype: str) -> bool:
         return is_number(text)
     if ftype == "date":
         return is_date(text)
+    if ftype == "isbn":
+        t = ISBN_PREFIX_RE.sub("", text.strip(" \t:;,.()[]")).strip(" \t:;,.()[]")
+        digits = re.sub(r"[^0-9Xx]", "", t)
+        return bool(re.fullmatch(r"[0-9Xx\- ]+", t)) and len(digits) in (10, 13)
     if ftype == "url":
         return bool(URL_RE.match(text.strip()))
     return is_text_value(text)

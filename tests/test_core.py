@@ -212,3 +212,22 @@ def test_soft_constraints_trade_off():
     assert ConstraintSolver(s, soft_lambda=5.0).solve(p, sc).fields["price"].text == "$129.00"   # penalty > gain
     soft = ConstraintSolver(s, soft_lambda=0.5).solve(p, sc)                              # penalty < gain
     assert soft.fields["price"].text == "$99.00" and any("soft_violations=1" in a for a in soft.active)
+
+
+def test_null_gold_and_isbn():
+    from smartscrape.loaders import _parse_gt
+    from smartscrape.formats import matches_type
+    assert _parse_gt("{'engine': ['<NULL>'], 'price': ['$9,970']}") == {"price": ["$9,970"]}
+    assert matches_type(": 9780316125581", "isbn") and matches_type("978-0-312-60539-1", "isbn")
+    assert not matches_type("Lisa Kleypas", "isbn") and not matches_type("12345", "isbn")
+
+
+def test_calibration_drops_format_that_rejects_gold():
+    from smartscrape.calibrate import calibrate
+    p = page()
+    p.gold["price"] = ["Call for price"]          # gold value that is not a price
+    p.nodes[idx(p, "$129.00")].text = "Call for price"
+    from smartscrape.data import assign_labels
+    assign_labels(p)
+    cal, rep = calibrate(schema(), [p])
+    assert not any(c.kind == "format" for c in cal.constraints)

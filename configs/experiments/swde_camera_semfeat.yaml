@@ -22,7 +22,7 @@ model:
   sentence_model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
   exclude_features: [path]
 top_k: 20
-soft_lambda_grid: [0.25, 0.5, 1, 2, 4, 8]
+soft_lambda_grid: [0, 0.1, 0.25, 0.5, 1, 2, 4, 8]
 calibrate: {enabled: true, min_support: 0.95, quantile: 0.95}
 methods:
   - argmax                           # GNN-only

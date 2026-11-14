@@ -1,0 +1,25 @@
+{
+  "mutual_exclusion": {
+    "kept": true,
+    "reason": "definitional"
+  },
+  "format(field=price)": {
+    "kept": true,
+    "reason": "definitional"
+  },
+  "exclude_regions(fields=all,regions=['footer', 'nav'])": {
+    "kept": true,
+    "support": 1.0
+  },
+  "proximity(a=price,b=product_title,max_distance=18.0)": {
+    "kept": true,
+    "support": 0.9994941831057157,
+    "max_distance_before": 14,
+    "max_distance_after": 18.0,
+    "gold_distance_median": 9.0
+  },
+  "ordering(after=price,before=product_title)": {
+    "kept": true,
+    "support": 1.0
+  }
+}

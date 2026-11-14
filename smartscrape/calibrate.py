@@ -8,7 +8,8 @@ often the *gold* record satisfies it, and:
   * proximity      -> max_distance is set to the q-quantile of gold distances
   * ordering       -> kept only if gold records satisfy it on >= min_support of pages
   * exclude_regions, position_band -> kept only if gold nodes satisfy them on >= min_support
-  * format, mutual_exclusion -> always kept (definitional)
+  * format         -> kept only if gold values pass the type check on >= min_support of pages
+  * mutual_exclusion -> always kept (definitional)
 
 The report is written next to the results so the paper can state exactly
 which constraints were active and why.
@@ -63,7 +64,7 @@ def calibrate(schema: Schema, pages: Sequence[Page], min_support: float = 0.95,
     report: Dict[str, dict] = {}
     for c in new.constraints:
         p = c.params
-        if c.kind in ("format", "mutual_exclusion"):
+        if c.kind == "mutual_exclusion":
             kept.append(c)
             report[c.name] = {"kept": True, "reason": "definitional"}
             continue
@@ -84,7 +85,7 @@ def calibrate(schema: Schema, pages: Sequence[Page], min_support: float = 0.95,
         if c.kind == "ordering":
             h = np.array([_ordering_holds(pg, p["before"], p["after"]) for pg in labelled], dtype=float)
             h = h[~np.isnan(h)]
-        else:  # exclude_regions, position_band
+        else:  # format, exclude_regions, position_band: node-local, checked on gold occurrences
             h = np.array([x for pg in labelled for x in _local_holds(pg, new, c)], dtype=float)
         support = float(h.mean()) if len(h) else 0.0
         ok = support >= min_support

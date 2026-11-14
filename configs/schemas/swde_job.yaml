@@ -1,0 +1,13 @@
+name: swde_job
+fields:
+  title:       {type: text, cardinality: one}
+  company:     {type: text, cardinality: optional}
+  location:    {type: text, cardinality: optional}
+  date_posted: {type: date, cardinality: optional}
+constraints:
+  - {kind: mutual_exclusion, rank: 10}
+  - {kind: format, field: date_posted, rank: 8}
+  - {kind: exclude_regions, regions: [footer, nav], fields: all, rank: 3}
+  - {kind: proximity, a: company, b: title, max_distance: 14, rank: 2}
+  - {kind: proximity, a: location, b: title, max_distance: 14, rank: 2}
+  - {kind: ordering, before: title, after: company, rank: 1}

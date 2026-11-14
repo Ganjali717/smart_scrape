@@ -86,6 +86,21 @@ private networks so the container can reach the server.
 The two `*200` configs share pages, splits and schema, so the difference
 between them is exactly what rendering adds.
 
+## Several verticals overnight, then the paper tables
+
+```bash
+python scripts/download_swde.py book auto job
+python scripts/run_suite.py configs/experiments/swde_book_semfeat.yaml \
+    configs/experiments/swde_auto_semfeat.yaml configs/experiments/swde_job_semfeat.yaml
+python scripts/make_tables.py results/swde_camera_semfeat results/swde_book_semfeat \
+    results/swde_auto_semfeat results/swde_job_semfeat --out results/tables
+```
+
+`run_suite.py` keeps going if one config fails and logs to `results/<name>.log`.
+`make_tables.py` writes CSV and LaTeX (booktabs) tables: main F1, violations,
+drift and reliability. `scripts/adaptive_gate.py` re-scores test sites with
+trained models to analyse, per site, when cross-field constraints help.
+
 ## Baselines (external tools, same data, same metrics)
 
 `smartscrape/baselines/` wraps external extractors behind one interface

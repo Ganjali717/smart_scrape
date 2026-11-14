@@ -115,7 +115,13 @@ def _parse_gt(gt: str) -> Dict[str, List[str]]:
         d = ast.literal_eval(gt)
     except Exception:
         d = json.loads(gt)
-    return {k: [str(x) for x in (v if isinstance(v, list) else [v])] for k, v in d.items()}
+    out = {}
+    for k, v in d.items():
+        vals = [str(x) for x in (v if isinstance(v, list) else [v])]
+        vals = [x for x in vals if x.strip() and x.strip().upper() != "<NULL>"]   # SWDE marks absent values
+        if vals:
+            out[k] = vals
+    return out
 
 
 def load_swde_vertical(html_root: str, gt_parquet: str, vertical: str,

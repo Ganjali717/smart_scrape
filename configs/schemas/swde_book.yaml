@@ -1,0 +1,15 @@
+name: swde_book
+fields:
+  title:            {type: text, cardinality: one}
+  author:           {type: text, cardinality: optional}
+  isbn_13:          {type: isbn, cardinality: optional}
+  publisher:        {type: text, cardinality: optional}
+  publication_date: {type: date, cardinality: optional}
+constraints:
+  - {kind: mutual_exclusion, rank: 10}
+  - {kind: format, field: isbn_13, rank: 8}
+  - {kind: format, field: publication_date, rank: 8}
+  - {kind: exclude_regions, regions: [footer, nav], fields: all, rank: 3}
+  - {kind: proximity, a: author, b: title, max_distance: 14, rank: 2}
+  - {kind: proximity, a: isbn_13, b: title, max_distance: 20, rank: 2}
+  - {kind: ordering, before: title, after: author, rank: 1}

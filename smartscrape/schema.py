@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-FIELD_TYPES = {"text", "price", "number", "date", "url"}
+FIELD_TYPES = {"text", "price", "number", "date", "url", "isbn"}
 CARDINALITIES = {"one", "optional"}
 CONSTRAINT_KINDS = {"mutual_exclusion", "format", "exclude_regions", "position_band", "proximity", "ordering"}
 NODE_LOCAL_KINDS = {"format", "exclude_regions", "position_band"}

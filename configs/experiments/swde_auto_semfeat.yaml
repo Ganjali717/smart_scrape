@@ -1,0 +1,34 @@
+# SWDE auto: same protocol as swde_camera_semfeat, 5 seeds, 500 pages per site (~5,000 pages, the size of camera).
+name: swde_auto_semfeat
+dataset:
+  type: swde
+  html_root: data/swde/html
+  gt_parquet: data/swde/auto-00000-of-00001.parquet
+  vertical: auto
+  max_pages_per_site: 500
+schema: configs/schemas/swde_auto.yaml
+split: {type: cross_site, train_sites: 3, val_sites: 2}
+seeds: [0, 1, 2, 3, 4]
+model:
+  hidden: 128
+  layers: 2
+  epochs: 40
+  lr: 0.001
+  pos_weight: 20
+  patience: 8
+  sentence_model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+  exclude_features: [path]
+top_k: 20
+soft_lambda_grid: [0, 0.1, 0.25, 0.5, 1, 2, 4, 8]
+calibrate: {enabled: true, min_support: 0.95, quantile: 0.95}
+methods:
+  - argmax
+  - filtered
+  - ilp
+  - ilp-uncalibrated
+  - ilp-soft
+drift:
+  - {name: distractor_block, kinds: [distractor_block], severity: 0.6}
+  - {name: all_combined, kinds: [wrapper_insertion, tag_rename, sibling_reorder, distractor_block], severity: 0.4}
+cache_dir: cache
+output: results/swde_auto_semfeat

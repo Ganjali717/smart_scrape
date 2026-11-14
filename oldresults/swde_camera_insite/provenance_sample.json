@@ -1,0 +1,423 @@
+[
+  {
+    "page": "amazon_0110",
+    "gold": {
+      "price": [
+        "$379.95"
+      ],
+      "manufacturer": [
+        "Panasonic",
+        ": Panasonic"
+      ],
+      "product_title": [
+        "Panasonic Lumix DMC-FZ35 12.1MP Digital Camera w/18x Optical Zoom (Black) BigVALUEInc 4GB Battery/Charger Filter Kit/Lens Accessory Saver Bundle IV"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 16.279369592666626,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 83,
+        "text": "Panasonic Lumix DMC-FZ35 12.1MP Digital Camera w/18x Optical Zoom (Black) BigVALUEInc 4GB Battery/Charger Filter Kit/Lens Accessory Saver Bundle IV",
+        "score": 6.2429,
+        "competitors": [
+          [
+            134,
+            -0.3642
+          ],
+          [
+            85,
+            -0.59
+          ],
+          [
+            65,
+            -3.0959
+          ]
+        ]
+      },
+      "price": {
+        "node": 110,
+        "text": "$379.95",
+        "score": 3.0722,
+        "competitors": [
+          [
+            65,
+            3.887
+          ],
+          [
+            66,
+            -7.0712
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 134,
+        "text": ": Panasonic",
+        "score": 6.9643,
+        "competitors": [
+          [
+            85,
+            6.725
+          ],
+          [
+            83,
+            -2.0481
+          ],
+          [
+            65,
+            -2.8297
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0026",
+    "gold": {
+      "price": [
+        "$126.95"
+      ],
+      "manufacturer": [
+        "Nikon",
+        ": Nikon"
+      ],
+      "product_title": [
+        "Nikon Coolpix S4000 12.0MP Digital Camera with 4x Optical Vibration Reduction (VR) Zoom and 3.0-Inch Touch-Panel LCD (Plum)"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 16.60466480255127,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 111,
+        "text": "Nikon Coolpix S4000 12.0MP Digital Camera with 4x Optical Vibration Reduction (VR) Zoom and 3.0-Inch Touch-Panel LCD (Plum)",
+        "score": 6.4463,
+        "competitors": [
+          [
+            113,
+            -0.0689
+          ],
+          [
+            168,
+            -0.3927
+          ],
+          [
+            65,
+            -3.0502
+          ]
+        ]
+      },
+      "price": {
+        "node": 138,
+        "text": "$126.95",
+        "score": 3.0783,
+        "competitors": [
+          [
+            65,
+            3.9252
+          ],
+          [
+            97,
+            -0.0047
+          ],
+          [
+            153,
+            -2.2069
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 113,
+        "text": "Nikon",
+        "score": 7.0801,
+        "competitors": [
+          [
+            168,
+            6.9485
+          ],
+          [
+            111,
+            -1.835
+          ],
+          [
+            65,
+            -2.6728
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0032",
+    "gold": {
+      "price": [
+        "$69.00"
+      ],
+      "manufacturer": [
+        "Olympus",
+        ": Olympus"
+      ],
+      "product_title": [
+        "Olympus T-100 12MP Digital Camera with 3x Optical Zoom and 2.4 inch LCD (Silver)"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 17.06740379333496,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 98,
+        "text": "Olympus T-100 12MP Digital Camera with 3x Optical Zoom and 2.4 inch LCD (Silver)",
+        "score": 6.4764,
+        "competitors": [
+          [
+            100,
+            -0.248
+          ],
+          [
+            149,
+            -0.2782
+          ],
+          [
+            154,
+            -0.4478
+          ]
+        ]
+      },
+      "price": {
+        "node": 127,
+        "text": "$69.00",
+        "score": 4.0914,
+        "competitors": [
+          [
+            65,
+            4.7568
+          ],
+          [
+            125,
+            3.004
+          ],
+          [
+            84,
+            -2.048
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 100,
+        "text": "Olympus",
+        "score": 6.4996,
+        "competitors": [
+          [
+            154,
+            6.2274
+          ],
+          [
+            65,
+            -1.8234
+          ],
+          [
+            98,
+            -1.9782
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0117",
+    "gold": {
+      "price": [
+        "$299.95"
+      ],
+      "manufacturer": [
+        "Kodak",
+        ": Kodak"
+      ],
+      "product_title": [
+        "Kodak EASYSHARE V1003 - Digital camera - compact - 10.0 Mpix - optical zoom: 3 x - supported memory: MMC, SD"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 17.33162760734558,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 83,
+        "text": "Kodak EASYSHARE V1003 - Digital camera - compact - 10.0 Mpix - optical zoom: 3 x - supported memory: MMC, SD",
+        "score": 6.6066,
+        "competitors": [
+          [
+            115,
+            0.3634
+          ],
+          [
+            85,
+            0.3511
+          ],
+          [
+            122,
+            0.0738
+          ]
+        ]
+      },
+      "price": {
+        "node": 90,
+        "text": "$299.95",
+        "score": 3.2524,
+        "competitors": [
+          [
+            65,
+            3.9507
+          ],
+          [
+            77,
+            1.7207
+          ],
+          [
+            107,
+            1.6216
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 85,
+        "text": "Kodak",
+        "score": 7.4726,
+        "competitors": [
+          [
+            122,
+            7.0163
+          ],
+          [
+            83,
+            -1.8304
+          ],
+          [
+            65,
+            -2.6971
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "page": "amazon_0112",
+    "gold": {
+      "price": [
+        "$499.95"
+      ],
+      "manufacturer": [
+        "Sony",
+        ": Sony"
+      ],
+      "product_title": [
+        "Sony Cybershot DSC-T9 6MP Digital Camera with 3x Optical Image Stabilization Zoom (Black)"
+      ]
+    },
+    "method": "ilp",
+    "status": "OPTIMAL",
+    "objective": 17.812140941619873,
+    "active_constraints": [
+      "mutual_exclusion",
+      "format(field=price)",
+      "exclude_regions(fields=all,regions=['footer', 'nav'])",
+      "proximity(a=price,b=product_title,max_distance=25.0)",
+      "ordering(after=price,before=product_title)"
+    ],
+    "relaxed_constraints": [],
+    "fields": {
+      "product_title": {
+        "node": 83,
+        "text": "Sony Cybershot DSC-T9 6MP Digital Camera with 3x Optical Image Stabilization Zoom (Black)",
+        "score": 6.6523,
+        "competitors": [
+          [
+            115,
+            0.5406
+          ],
+          [
+            85,
+            0.0682
+          ],
+          [
+            118,
+            -0.289
+          ]
+        ]
+      },
+      "price": {
+        "node": 90,
+        "text": "$499.95",
+        "score": 3.9272,
+        "competitors": [
+          [
+            65,
+            4.2179
+          ],
+          [
+            107,
+            2.3747
+          ],
+          [
+            88,
+            -0.3077
+          ]
+        ]
+      },
+      "manufacturer": {
+        "node": 85,
+        "text": "Sony",
+        "score": 7.2326,
+        "competitors": [
+          [
+            118,
+            6.7736
+          ],
+          [
+            83,
+            -1.5264
+          ],
+          [
+            65,
+            -2.6484
+          ]
+        ]
+      }
+    }
+  }
+]
